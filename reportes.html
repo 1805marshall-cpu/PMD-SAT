@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Oficial COPLADEMUN - PMD 2026-2029</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- Firebase SDKs versión Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        @media print {
+            body { background-color: white !important; }
+            .no-print { display: none !important; }
+            .print-shadow { box-shadow: none !important; border: none !important; }
+            .page-break { page-break-after: always; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 antialiased font-sans text-slate-800 relative">
+
+    <!-- Contenedor de Notificaciones Toast -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- Header de Navegación (No se imprime) -->
+    <header class="bg-[#7A1C30] text-white border-b border-[#521220] sticky top-0 z-40 shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <img src="img/2.png" alt="San Andrés Tuxtla 2026-2029" class="h-10 object-contain">
+                <div class="border-l border-white/20 pl-4">
+                    <h1 class="font-bold text-sm leading-tight text-white">H. Ayuntamiento de San Andrés Tuxtla</h1>
+                    <p class="text-[11px] text-amber-100 flex items-center gap-2 mt-0.5">
+                        <span>Generador de Informe Ejecutivo COPLADEMUN</span>
+                        <img src="img/3.png" alt="¡Capaz de Resolver!" class="h-3.5 object-contain inline-block">
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="dashboard.html" class="text-xs text-[#7A1C30] bg-white hover:bg-slate-100 font-bold px-3 py-1.5 rounded transition shadow-sm">← Regresar al Dashboard</a>
+                <button type="button" onclick="window.print()" class="text-xs text-white bg-amber-600 hover:bg-amber-700 font-bold px-4 py-1.5 rounded transition shadow-sm flex items-center gap-1.5">
+                    🖨️ Imprimir / Guardar PDF Oficial
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal del Informe (Formato Institucional) -->
+    <main class="max-w-5xl mx-auto px-6 py-10 space-y-8">
+        
+        <!-- Hoja Membretada de Presentación -->
+        <div class="bg-white border border-slate-200 shadow-sm p-8 space-y-6 print-shadow rounded-xl">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-6">
+                <div>
+                    <h2 class="text-xl font-extrabold text-[#7A1C30]">H. AYUNTAMIENTO CONSTITUCIONAL DE SAN ANDRÉS TUXTLA, VER.</h2>
+                    <p class="text-xs font-semibold text-slate-600 mt-1">PLAN MUNICIPAL DE DESARROLLO 2026-2029 — "¡CAPAZ DE RESOLVER!"</p>
+                    <p class="text-[11px] text-slate-400 mt-0.5">INFORME CONSOLIDADO DE AVANCE FÍSICO Y FINANCIERO (COPLADEMUN)</p>
+                </div>
+                <img src="img/1.png" alt="Escudo" class="h-20 object-contain">
+            </div>
+
+            <!-- Datos Generales del Periodo -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
+                <div>
+                    <span class="block text-slate-400 font-medium">Fecha de Emisión:</span>
+                    <span id="labelFechaEmision" class="font-bold text-slate-800">--/--/----</span>
+                </div>
+                <div>
+                    <span class="block text-slate-400 font-medium">Estatus del Sistema:</span>
+                    <span class="font-bold text-emerald-700">🟢 Sincronizado (EDM-SAT)</span>
+                </div>
+                <div>
+                    <span class="block text-slate-400 font-medium">Total de Registros:</span>
+                    <span id="labelTotalRegistros" class="font-bold text-slate-800">0</span>
+                </div>
+                <div>
+                    <span class="block text-slate-400 font-medium">Índice Global (IE):</span>
+                    <span id="labelIndiceGlobal" class="font-bold text-[#7A1C30]">0.0%</span>
+                </div>
+            </div>
+
+            <!-- Resumen por Dependencia -->
+            <div class="space-y-3 pt-2">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">1. Consolidado de Avance por Eje y Dependencia</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] font-semibold border-b border-slate-200">
+                                <th class="p-2.5">Dependencia / Área Responsable</th>
+                                <th class="p-2.5 text-center">Reportes Capturados</th>
+                                <th class="p-2.5 text-center">Promedio Cumplimiento (IE)</th>
+                                <th class="p-2.5">Estatus Operativo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyResumenDept" class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td colspan="4" class="p-4 text-center text-slate-400 italic">Cargando métricas institucionales...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Detalle de Acciones y Evidencias -->
+            <div class="space-y-3 pt-4">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">2. Bitácora Analítica de Acciones y Evidencias Validadas</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 uppercase text-[10px] font-semibold border-b border-slate-200">
+                                <th class="p-2.5">Área / Programa</th>
+                                <th class="p-2.5">Localidad</th>
+                                <th class="p-2.5 text-center">Meta Prog. / Real</th>
+                                <th class="p-2.5 text-center">IE (%)</th>
+                                <th class="p-2.5">Estatus Auditoría</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyDetalleInforme" class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td colspan="5" class="p-4 text-center text-slate-400 italic">Cargando bitácora detallada...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Firmas de Autorización Institucional -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 pt-16 pb-6 text-center text-xs">
+                <div class="space-y-2">
+                    <div class="border-b border-slate-400 w-3/4 mx-auto pb-8"></div>
+                    <p class="font-bold text-slate-900">PRESIDENCIA MUNICIPAL</p>
+                    <p class="text-[11px] text-slate-500">H. Ayuntamiento de San Andrés Tuxtla</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="border-b border-slate-400 w-3/4 mx-auto pb-8"></div>
+                    <p class="font-bold text-slate-900">CONTRALORÍA MUNICIPAL</p>
+                    <p class="text-[11px] text-slate-500">Órgano de Evaluación y Auditoría PMD</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Scripts de la aplicación -->
+    <script src="js/app.js"></script>
+    <script>
+        function mostrarNotificacion(mensaje, tipo = 'exito') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bgColor = tipo === 'exito' ? 'bg-emerald-900/95 border-emerald-700 text-white' : 'bg-rose-900/95 border-rose-700 text-white';
+            const icono = tipo === 'exito' ? '✨' : '⚠️';
+            toast.className = `pointer-events-auto flex items-center space-x-3 px-4 py-3 rounded-lg shadow-xl border backdrop-blur-md text-xs font-semibold transition-all duration-300 transform translate-y-2 opacity-0 ${bgColor}`;
+            toast.innerHTML = `<span>${icono}</span> <span>${mensaje}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fecha actual formateada
+            const hoy = new Date();
+            document.getElementById('labelFechaEmision').innerText = hoy.toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            setTimeout(() => {
+                if (typeof verificarSesionActiva === 'function') {
+                    verificarSesionActiva(true);
+                }
+                if (typeof obtenerReportesBD === 'function') {
+                    generarDatosInforme();
+                } else {
+                    setTimeout(generarDatosInforme, 1000);
+                }
+            }, 500);
+        });
+
+        async function generarDatosInforme() {
+            if (typeof obtenerReportesBD !== 'function') return;
+
+            const reportes = await obtenerReportesBD();
+            document.getElementById('labelTotalRegistros').innerText = reportes.length;
+
+            if (reportes.length === 0) {
+                document.getElementById('tbodyResumenDept').innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">No hay registros capturados en Firestore para generar el informe.</td></tr>`;
+                document.getElementById('tbodyDetalleInforme').innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Sin registros disponibles.</td></tr>`;
+                return;
+            }
+
+            function limpiarPorcentaje(str) {
+                if (!str) return 0;
+                let num = parseFloat(str.replace('%', '').trim());
+                return isNaN(num) ? 0 : num;
+            }
+
+            // Promedio global
+            let sumaGlobal = reportes.reduce((acc, r) => acc + limpiarPorcentaje(r.porcentajeIE), 0);
+            let promedioGlobal = (sumaGlobal / reportes.length).toFixed(1);
+            document.getElementById('labelIndiceGlobal').innerText = promedioGlobal + '%';
+
+            // Agrupar por dependencia
+            const dependenciasList = [
+                "Gobernación y Seguridad Pública",
+                "Desarrollo Económico",
+                "DIF Municipal",
+                "Servicios Públicos Municipales",
+                "Obras Públicas e Infraestructura",
+                "Instituto de la Mujer e Inclusión"
+            ];
+
+            let tbodyResumen = document.getElementById('tbodyResumenDept');
+            tbodyResumen.innerHTML = "";
+
+            dependenciasList.forEach(dep => {
+                let rDept = reportes.filter(r => r.dependencia === dep);
+                let count = rDept.length;
+                let prom = 0;
+                if (count > 0) {
+                    let suma = rDept.reduce((acc, r) => acc + limpiarPorcentaje(r.porcentajeIE), 0);
+                    prom = (suma / count).toFixed(1);
+                }
+
+                let estatusBadge = prom >= 85 ? '<span class="text-emerald-700 font-bold">🟢 Satisfactorio</span>' : (prom >= 70 ? '<span class="text-amber-700 font-bold">🟡 En Proceso</span>' : '<span class="text-slate-500 font-bold">⚪ Sin Captura</span>');
+
+                let tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-2.5 font-semibold text-slate-800">${dep}</td>
+                    <td class="p-2.5 text-center font-medium">${count}</td>
+                    <td class="p-2.5 text-center font-bold text-[#7A1C30]">${prom}%</td>
+                    <td class="p-2.5">${estatusBadge}</td>
+                `;
+                tbodyResumen.appendChild(tr);
+            });
+
+            // Llenar tabla detallada
+            let tbodyDetalle = document.getElementById('tbodyDetalleInforme');
+            tbodyDetalle.innerHTML = "";
+            reportes.forEach(item => {
+                let tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-2.5 font-medium text-slate-800"><strong>[${item.dependencia || 'General'}]</strong> ${item.programa || item.descripcion || 'Sin descripción'}</td>
+                    <td class="p-2.5">${item.localidad || 'N/A'}</td>
+                    <td class="p-2.5 text-center">${item.metaProgramada || '-'} / ${item.metaAlcanzada || '-'}</td>
+                    <td class="p-2.5 text-center font-bold text-[#7A1C30]">${item.porcentajeIE || '0%'}</td>
+                    <td class="p-2.5 font-semibold text-slate-600">${item.estatusAuditoria || 'Pendiente'}</td>
+                `;
+                tbodyDetalle.appendChild(tr);
+            });
+
+            mostrarNotificacion("Informe COPLADEMUN generado correctamente.", "exito");
+        }
+    </script>
+</body>
+</html>

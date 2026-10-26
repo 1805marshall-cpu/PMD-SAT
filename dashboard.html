@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Global PMD 2026-2029 - San Andrés Tuxtla</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- Firebase SDKs versión Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-slate-50 antialiased font-sans text-slate-800 relative">
+
+    <!-- Contenedor de Notificaciones Estilizadas (Toasts) -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- Header / Navbar Institucional Superior -->
+    <header class="bg-[#7A1C30] text-white border-b border-[#521220] sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <img src="img/2.png" alt="San Andrés Tuxtla 2026-2029" class="h-10 object-contain">
+                <div class="border-l border-white/20 pl-4">
+                    <h1 class="font-bold text-sm leading-tight text-white flex items-center gap-2">
+                        H. Ayuntamiento de San Andrés Tuxtla 
+                    </h1>
+                    <p class="text-[11px] text-amber-100 flex items-center gap-2 mt-0.5">
+                        <span>Sistema de Seguimiento PMD 2026-2029</span>
+                        <img src="img/3.png" alt="¡Capaz de Resolver!" class="h-4 object-contain inline-block">
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-6 text-xs border-l border-white/20 pl-6">
+                <div class="h-8 w-px bg-white/20"></div>
+                <div class="flex items-center space-x-3">
+                    <a href="reportes.html" class="bg-white text-[#7A1C30] hover:bg-slate-100 px-3 py-1.5 rounded font-bold text-xs transition shadow-sm flex items-center gap-1.5">
+                        📄 Generar Informe COPLADEMUN
+                    </a>
+                    <button type="button" onclick="window.cerrarSesionBD()" class="text-xs text-white bg-[#521220] hover:bg-red-900 border border-white/20 font-bold px-3 py-1.5 rounded transition shadow-sm">
+                        Cerrar Sesión 🚪
+                    </button>
+                </div>
+                <div>
+                    <span class="block text-slate-200">Panel Ejecutivo</span>
+                    <!-- Etiqueta dinámica con ID para el usuario conectado -->
+                    <span id="labelUsuarioConectado" class="font-semibold text-amber-100">Cargando...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+
+        <!-- Banner Principal de Avance Municipal -->
+        <div class="gob-card p-6 bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
+            <div class="absolute right-4 -bottom-6 opacity-5 pointer-events-none">
+                <img src="img/1.png" alt="Escudo" class="h-48 object-contain">
+            </div>
+
+            <div class="space-y-1 z-10">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Cumplimiento Acumulado General (Datos Reales de Base de Datos)</span>
+                <h2 class="text-2xl font-bold text-slate-900">Evaluación de Desempeño por Ejes y Programas Institucionales</h2>
+                <p class="text-xs text-slate-500">Métricas consolidadas dinámicamente a partir de las evidencias cargadas por cada dependencia municipal.</p>
+            </div>
+            <div class="flex items-center space-x-6 border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-6 w-full md:w-auto justify-around z-10">
+                <div class="text-center">
+                    <span class="block text-xs font-medium text-slate-500">Avance Global (IE)</span>
+                    <span id="globalPorcentaje" class="text-3xl font-extrabold text-[#7A1C30]">0.0%</span>
+                </div>
+                <div class="text-center">
+                    <span class="block text-xs font-medium text-slate-500">Estatus Operativo</span>
+                    <span id="globalEstatus" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 mt-1">
+                        ⏳ Analizando...
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rejilla de Ejes Organizados -->
+        <div>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Ejes Estratégicos y Dependencias Responsables (PMD 2026-2029)</h3>
+                <span class="text-xs text-slate-400">Seleccione un eje para ingresar a su sistema de captura</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Eje 1 -->
+                <div class="gob-card p-5 space-y-4 border-l-4 border-l-transparent hover:border-l-[#7A1C30] hover:shadow-md transition-all duration-200 group bg-white border border-slate-200 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-[#7A1C30]/10 group-hover:text-[#7A1C30] transition">Eje 1</span>
+                            <span id="badgeEje1" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">0.0%</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">Gobernar con Capacidad</h4>
+                            <p class="text-xs text-slate-500 mt-1">Gobernación, Seguridad Pública, Transparencia y Control Interno.</p>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+                        <span class="text-[11px] text-slate-400 group-hover:text-[#7A1C30] group-hover:font-bold transition">Módulo Operativo</span>
+                        <a href="departamentos/eje1.html" class="text-xs font-bold text-white bg-[#7A1C30] px-3 py-1.5 rounded hover:bg-[#521220] transition">Capturar Datos →</a>
+                    </div>
+                </div>
+
+                <!-- Eje 2 -->
+                <div class="gob-card p-5 space-y-4 border-l-4 border-l-transparent hover:border-l-[#7A1C30] hover:shadow-md transition-all duration-200 group bg-white border border-slate-200 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-[#7A1C30]/10 group-hover:text-[#7A1C30] transition">Eje 2</span>
+                            <span id="badgeEje2" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">0.0%</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">Desarrollo Económico que Genera</h4>
+                            <p class="text-xs text-slate-500 mt-1">Fomento Agropecuario, Turismo, Comercio y Empleo Local.</p>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+                        <span class="text-[11px] text-slate-400 group-hover:text-[#7A1C30] group-hover:font-bold transition">Módulo Operativo</span>
+                        <a href="departamentos/eje2.html" class="text-xs font-bold text-white bg-[#7A1C30] px-3 py-1.5 rounded hover:bg-[#521220] transition">Capturar Datos →</a>
+                    </div>
+                </div>
+
+                <!-- Eje 3 -->
+                <div class="gob-card p-5 space-y-4 border-l-4 border-l-transparent hover:border-l-[#7A1C30] hover:shadow-md transition-all duration-200 group bg-white border border-slate-200 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-[#7A1C30]/10 group-hover:text-[#7A1C30] transition">Eje 3</span>
+                            <span id="badgeEje3" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">0.0%</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">Bienestar que se Construye</h4>
+                            <p class="text-xs text-slate-500 mt-1">DIF Municipal, Programas Sociales, Salud y Grupos Vulnerables.</p>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+                        <span class="text-[11px] text-slate-400 group-hover:text-[#7A1C30] group-hover:font-bold transition">Módulo Operativo</span>
+                        <a href="departamentos/eje3.html" class="text-xs font-bold text-white bg-[#7A1C30] px-3 py-1.5 rounded hover:bg-[#521220] transition">Capturar Datos →</a>
+                    </div>
+                </div>
+
+                <!-- Eje 4 -->
+                <div class="gob-card p-5 space-y-4 border-l-4 border-l-transparent hover:border-l-[#7A1C30] hover:shadow-md transition-all duration-200 group bg-white border border-slate-200 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600 group-hover:bg-[#7A1C30]/10 group-hover:text-[#7A1C30] transition">Eje 4</span>
+                            <span id="badgeEje4" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">0.0%</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">Servicios Públicos con Resultados</h4>
+                            <p class="text-xs text-slate-500 mt-1">Limpia Pública, Alumbrado, Obras Públicas y Agua Potable.</p>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+                        <span class="text-[11px] text-slate-400 group-hover:text-[#7A1C30] group-hover:font-bold transition">Módulo Operativo</span>
+                        <a href="departamentos/eje4.html" class="text-xs font-bold text-white bg-[#7A1C30] px-3 py-1.5 rounded hover:bg-[#521220] transition">Capturar Datos →</a>
+                    </div>
+                </div>
+
+                <!-- Eje Transversal -->
+                <div class="gob-card p-5 space-y-4 border-l-4 border-l-transparent hover:border-l-[#7A1C30] hover:shadow-md transition-all duration-200 group bg-white border border-slate-200 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-start">
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 group-hover:bg-[#7A1C30] group-hover:text-white transition">Transversal</span>
+                            <span id="badgeEje5" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">0.0%</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-900">Igualdad Sustantiva e Inclusión</h4>
+                            <p class="text-xs text-slate-500 mt-1">Instituto de la Mujer, Derechos Indígenas e Inclusión Social.</p>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+                        <span class="text-[11px] text-slate-400 group-hover:text-[#7A1C30] group-hover:font-bold transition">Módulo Operativo</span>
+                        <a href="departamentos/transversal.html" class="text-xs font-bold text-white bg-[#7A1C30] px-3 py-1.5 rounded hover:bg-[#521220] transition">Capturar Datos →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Estado de Auditoría con Evidencias Completas -->
+        <div class="gob-card overflow-hidden bg-white border border-slate-200">
+            <div class="p-4 bg-slate-100 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Bitácora de Evidencias e Informes en Tiempo Real</h3>
+                    <p class="text-[11px] text-slate-400">Control de estatus, observaciones y auditoría institucional (EDM-SAT).</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="inputBuscarTabla" onkeyup="filtrarTablaDashboard()" placeholder="🔍 Buscar por cualquier campo..." class="text-xs border border-slate-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#7A1C30]">
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="tablaDashboard" class="w-full text-left text-xs text-slate-600">
+                    <thead class="bg-slate-50 uppercase text-slate-400 border-b border-slate-200 font-semibold">
+                        <tr>
+                            <th class="p-3">Eje Institucional</th>
+                            <th class="p-3">Acción / Indicador Reportado</th>
+                            <th class="p-3">Área / Sector y Observaciones</th>
+                            <th class="p-3 text-center">% Avance (IE)</th>
+                            <th class="p-3 text-center">Evidencias</th>
+                            <th class="p-3">Estatus de Auditoría</th>
+                            <th class="p-3">Comentarios de Auditoría</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyDashboard" class="divide-y divide-slate-100">
+                        <tr>
+                            <td colspan="7" class="p-6 text-center text-slate-400 italic">Cargando bitácora general de Firebase...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            <div id="paginacionContainer" class="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center text-xs">
+                <span id="infoPaginacion" class="text-slate-500 font-medium">Mostrando 0 de 0 registros</span>
+                <div class="flex items-center space-x-2">
+                    <button type="button" id="btnAnterior" onclick="cambiarPagina(-1)" class="px-3 py-1 bg-white border border-slate-300 rounded text-slate-600 font-semibold hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-sm">← Anterior</button>
+                    <span id="textoPaginaActual" class="px-3 py-1 bg-white border border-slate-200 rounded font-bold text-[#7A1C30]">Página 1 de 1</span>
+                    <button type="button" id="btnSiguiente" onclick="cambiarPagina(1)" class="px-3 py-1 bg-white border border-slate-300 rounded text-slate-600 font-semibold hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-sm">Siguiente →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CARRUSEL INTERACTIVO DE FOTOGRAFÍAS -->
+    <div id="modalCarrusel" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="relative max-w-4xl w-full bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 p-6 flex flex-col items-center space-y-4">
+            <div class="w-full flex justify-between items-center border-b border-slate-800 pb-3">
+                <div>
+                    <h3 id="carruselTitulo" class="text-sm font-bold text-white">Evidencia Fotográfica de Campo</h3>
+                    <p id="carruselSubtitulo" class="text-[11px] text-amber-300 italic">Inspección de avance institucional</p>
+                </div>
+                <button type="button" onclick="window.cerrarCarrusel()" class="text-slate-400 hover:text-white font-bold text-xl px-2 py-1">✕ Cerrar</button>
+            </div>
+            <div class="relative w-full h-[60vh] flex items-center justify-center bg-black/50 rounded-xl overflow-hidden border border-slate-800">
+                <button type="button" onclick="window.cambiarFotoCarrusel(-1)" class="absolute left-3 z-10 bg-black/70 hover:bg-[#7A1C30] text-white p-3 rounded-full font-bold transition shadow-lg">❮</button>
+                <img id="carruselImagenActiva" class="max-h-full max-w-full object-contain transition-all duration-300 rounded-lg shadow-xl" alt="Evidencia">
+                <button type="button" onclick="window.cambiarFotoCarrusel(1)" class="absolute right-3 z-10 bg-black/70 hover:bg-[#7A1C30] text-white p-3 rounded-full font-bold transition shadow-lg">❯</button>
+            </div>
+            <div class="w-full flex justify-between items-center pt-2 border-t border-slate-800 text-xs text-slate-400">
+                <span id="carruselContador" class="font-bold text-amber-200">Foto 1 de 5</span>
+                <span class="italic text-[11px]">Use las flechas laterales para navegar entre las evidencias.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script General -->
+    <script src="js/app.js"></script>
+    <script>
+        let todosLosReportesGlobales = [];
+        let reportesFiltradosGlobales = [];
+        let paginaActual = 1;
+        const registrosPorPagina = 10;
+        
+        // Variables globales para el Carrusel
+        let carruselFotosActuales = [];
+        let carruselIndiceActual = 0;
+
+        function mostrarNotificacion(mensaje, tipo = 'exito') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bgColor = tipo === 'exito' ? 'bg-emerald-900/95 text-white' : 'bg-rose-900/95 text-white';
+            toast.className = `pointer-events-auto px-4 py-3 rounded-lg shadow-xl text-xs font-semibold transition-all ${bgColor}`;
+            toast.innerHTML = `<span>${mensaje}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        // 🔒 Validación estricta de privilegios de Administrador
+        const tipoUsuario = localStorage.getItem('tipoUsuario');
+        const sesion = JSON.parse(localStorage.getItem("sesion_pmd_sat") || "{}");
+
+        if (!tipoUsuario || tipoUsuario !== 'admin') {
+            mostrarNotificacion("⚠️ Acceso restringido. Solo administradores.", "error");
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+            return;
+        }
+
+        // Mostrar el nombre del departamento o usuario conectado en el header
+        const labelUser = document.getElementById('labelUsuarioConectado');
+        if (labelUser) {
+            labelUser.innerText = sesion.nombreDep || "Administrador General";
+        }
+
+        if (typeof verificarSesionActiva === 'function') verificarSesionActiva(true);
+        if (typeof obtenerReportesBD === 'function') cargarBitacoraGlobal();
+    }, 500);
+});
+        async function cargarBitacoraGlobal() {
+            if (typeof obtenerReportesBD !== 'function') return;
+            todosLosReportesGlobales = await obtenerReportesBD();
+            reportesFiltradosGlobales = [...todosLosReportesGlobales];
+            actualizarEstadisticasReales(todosLosReportesGlobales);
+            paginaActual = 1;
+            renderizarTablaPaginada();
+        }
+
+        function actualizarEstadisticasReales(reportes) {
+            if (!reportes || reportes.length === 0) return;
+            function limpiarPorcentaje(str) {
+                if (!str) return 0;
+                let num = parseFloat(str.replace('%', '').trim());
+                return isNaN(num) ? 0 : num;
+            }
+
+            const ejeMap = {
+                "Eje 1: Gobernar con Capacidad": "badgeEje1",
+                "Eje 2: Desarrollo Económico que Genera": "badgeEje2",
+                "Eje 3: Bienestar que se Construye": "badgeEje3",
+                "Eje 4: Servicios Públicos e Infraestructura": "badgeEje4",
+                "Eje 5: Igualdad Sustantiva e Inclusión Social": "badgeEje5"
+            };
+
+            let sumaTotalGlobal = 0;
+            for (const [ejeName, elementId] of Object.entries(ejeMap)) {
+                let repEje = reportes.filter(r => r.dependencia === ejeName || r.eje === ejeName);
+                let badgeEl = document.getElementById(elementId);
+                if (badgeEl && repEje.length > 0) {
+                    let sumaEje = repEje.reduce((acc, r) => acc + limpiarPorcentaje(r.porcentajeIE), 0);
+                    badgeEl.innerText = (sumaEje / repEje.length).toFixed(1) + '%';
+                }
+            }
+
+            sumaTotalGlobal = reportes.reduce((acc, r) => acc + limpiarPorcentaje(r.porcentajeIE), 0);
+            let promedioGlobal = (sumaTotalGlobal / reportes.length).toFixed(1);
+            document.getElementById('globalPorcentaje').innerText = promedioGlobal + '%';
+        }
+
+        function renderizarTablaPaginada() {
+            const tbody = document.getElementById('tbodyDashboard');
+            if (!tbody) return;
+
+            if (reportesFiltradosGlobales.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 italic">📂 No hay registros de avance capturados.</td></tr>`;
+                return;
+            }
+
+            const totalRegistros = reportesFiltradosGlobales.length;
+            const totalPaginas = Math.ceil(totalRegistros / registrosPorPagina);
+            if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+            if (paginaActual < 1) paginaActual = 1;
+
+            const inicio = (paginaActual - 1) * registrosPorPagina;
+            const fin = inicio + registrosPorPagina;
+            const reportesPagina = reportesFiltradosGlobales.slice(inicio, fin);
+
+            tbody.innerHTML = "";
+            reportesPagina.forEach((item, indexReal) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 transition border-b border-slate-100 align-top";
+
+                // --- EVIDENCIAS: ICONOS DE BOOTSTRAP (IMAGES Y PDF) ---
+                let numFotos = item.fotosEvidencia?.length || (item.evidenciaBase64 ? 1 : 0);
+                let tieneFotos = (item.fotosEvidencia && item.fotosEvidencia.length > 0) || item.evidenciaBase64;
+
+                let evidenciasHtml = '<div class="flex items-center justify-center gap-3">';
+                
+                if (tieneFotos) {
+                    evidenciasHtml += `
+                        <button type="button" onclick="window.abrirCarruselGlobal(${inicio + indexReal})" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-[#7A1C30] border border-slate-300 rounded-lg text-[10px] font-bold inline-flex flex-col items-center gap-0.5 transition shadow-sm" title="Ver carrusel de ${numFotos} fotos">
+                            <i class="bi bi-images text-base"></i>
+                            <span>Ver ${numFotos} fotos</span>
+                        </button>
+                    `;
+                } else {
+                    evidenciasHtml += `<span class="text-slate-400 italic text-[11px]">Sin fotos</span>`;
+                }
+
+                if (item.documentoPdfBase64) {
+                    evidenciasHtml += `
+                        <a href="${item.documentoPdfBase64}" download="${item.documentoPdfNombre || 'Documento.pdf'}" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-[10px] font-bold inline-flex flex-col items-center gap-0.5 transition shadow-sm" title="Descargar documento PDF oficial">
+                            <i class="bi bi-file-earmark-pdf text-base"></i>
+                            <span>Descargar</span>
+                        </a>
+                    `;
+                }
+                evidenciasHtml += '</div>';
+
+                const estatusActual = item.estatusAuditoria || "En Revisión";
+                const selectEstatusHtml = `
+                    <select onchange="window.cambiarEstatusReporte('${item.id}', this.value)" class="text-[11px] font-semibold border rounded px-2 py-1 bg-slate-50 focus:ring-1 focus:ring-[#7A1C30]">
+                        <option value="En Revisión" ${estatusActual === 'En Revisión' ? 'selected' : ''}>🔍 En Revisión</option>
+                        <option value="Aprobado" ${estatusActual === 'Aprobado' ? 'selected' : ''}>✅ Aprobado</option>
+                        <option value="Corrección" ${estatusActual === 'Corrección' ? 'selected' : ''}>⚠️ Corrección</option>
+                    </select>
+                `;
+
+                // Campo de observaciones con autoguardado (onblur)
+                const observacionActual = item.comentariosAuditoria || "";
+                const inputObsHtml = `
+                    <textarea rows="2" placeholder="Escribir comentarios..." onblur="window.guardarObservacionReporte('${item.id}', this.value)" class="text-[11px] border border-slate-200 rounded px-2 py-1 w-full bg-slate-50 focus:bg-white focus:ring-1 focus:ring-[#7A1C30] resize-none">${observacionActual}</textarea>
+                `;
+
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-800">${item.dependencia || 'General'}</td>
+                    <td class="p-3">${item.programa || item.descripcion || 'Sin descripción'}</td>
+                    <td class="p-3 space-y-0.5">
+                        <p class="font-bold text-slate-900">${item.localidad || 'N/A'}</p>
+                        <p class="text-[11px] text-slate-500 italic">"${item.descripcion || 'Sin observaciones'}"</p>
+                    </td>
+                    <td class="p-3 text-center font-bold text-[#7A1C30]">${item.porcentajeIE || '0%'}</td>
+                    <td class="p-3 text-center">${evidenciasHtml}</td>
+                    <td class="p-3">${selectEstatusHtml}</td>
+                    <td class="p-3">${inputObsHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('infoPaginacion').innerText = `Mostrando del ${inicio + 1} al ${Math.min(fin, totalRegistros)} de ${totalRegistros} registros`;
+            document.getElementById('textoPaginaActual').innerText = `Página ${paginaActual} de ${totalPaginas}`;
+            document.getElementById('btnAnterior').disabled = paginaActual === 1;
+            document.getElementById('btnSiguiente').disabled = paginaActual === totalPaginas;
+        }
+
+        // --- LÓGICA DEL CARRUSEL EN EL DASHBOARD ---
+        window.abrirCarruselGlobal = function(indexGlobal) {
+            const item = reportesFiltradosGlobales[indexGlobal];
+            carruselFotosActuales = [];
+
+            if (item.fotosEvidencia && item.fotosEvidencia.length > 0) {
+                carruselFotosActuales = item.fotosEvidencia.map(f => f.base64);
+            } else if (item.evidenciaBase64) {
+                carruselFotosActuales = [item.evidenciaBase64];
+            }
+
+            if (carruselFotosActuales.length === 0) {
+                mostrarNotificacion("Este reporte no contiene fotografías.", "error");
+                return;
+            }
+
+            carruselIndiceActual = 0;
+            document.getElementById('carruselTitulo').innerText = `Reporte: ${item.programa || item.dependencia}`;
+            document.getElementById('carruselSubtitulo').innerText = `Área: ${item.localidad || 'N/A'}`;
+            
+            actualizarImagenCarrusel();
+            document.getElementById('modalCarrusel').classList.remove('hidden');
+        };
+
+        window.cambiarFotoCarrusel = function(dir) {
+            carruselIndiceActual += dir;
+            if (carruselIndiceActual < 0) carruselIndiceActual = carruselFotosActuales.length - 1;
+            if (carruselIndiceActual >= carruselFotosActuales.length) carruselIndiceActual = 0;
+            actualizarImagenCarrusel();
+        };
+
+        function actualizarImagenCarrusel() {
+            document.getElementById('carruselImagenActiva').src = carruselFotosActuales[carruselIndiceActual];
+            document.getElementById('carruselContador').innerText = `Foto ${carruselIndiceActual + 1} de ${carruselFotosActuales.length}`;
+        }
+
+        window.cerrarCarrusel = () => document.getElementById('modalCarrusel').classList.add('hidden');
+
+        function cambiarPagina(dir) { paginaActual += dir; renderizarTablaPaginada(); }
+
+        function filtrarTablaDashboard() {
+            const query = document.getElementById('inputBuscarTabla').value.toUpperCase().trim();
+            reportesFiltradosGlobales = !query ? [...todosLosReportesGlobales] : todosLosReportesGlobales.filter(item => {
+                return `${item.dependencia} ${item.programa} ${item.descripcion} ${item.localidad} ${item.estatusAuditoria} ${item.comentariosAuditoria}`.toUpperCase().includes(query);
+            });
+            paginaActual = 1;
+            renderizarTablaPaginada();
+        }
+
+        window.cambiarEstatusReporte = async function(id, nuevoEstatus) {
+            const res = await actualizarReporteBD(id, { estatusAuditoria: nuevoEstatus });
+            if (res && res.exito) {
+                const item = todosLosReportesGlobales.find(r => r.id === id);
+                if (item) item.estatusAuditoria = nuevoEstatus;
+                mostrarNotificacion("Estatus actualizado correctamente.", "exito");
+            } else {
+                mostrarNotificacion("Error al actualizar estatus.", "error");
+            }
+        };
+
+        window.guardarObservacionReporte = async function(id, texto) {
+            const res = await actualizarReporteBD(id, { comentariosAuditoria: texto });
+            if (res && res.exito) {
+                const item = todosLosReportesGlobales.find(r => r.id === id);
+                if (item) item.comentariosAuditoria = texto;
+                mostrarNotificacion("Comentarios de auditoría guardados y sincronizados.", "exito");
+            } else {
+                mostrarNotificacion("Error al guardar comentarios.", "error");
+            }
+        };
+    </script>
+</body>
+</html>

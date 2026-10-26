@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eje 1: Gobernar con Capacidad - Sistema PMD 2026-2029</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+    <!-- Firebase SDKs versión Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-slate-50 antialiased font-sans text-slate-800 relative">
+
+    <!-- Contenedor de Notificaciones Estilizadas (Toasts) -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
+
+    <!-- Navbar Institucional -->
+    <header class="bg-[#7A1C30] text-white border-b border-[#521220] sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <img src="../img/2.png" alt="San Andrés Tuxtla 2026-2029" class="h-10 object-contain">
+                <div class="border-l border-white/20 pl-4">
+                    <h1 class="font-bold text-sm leading-tight text-white">H. Ayuntamiento de San Andrés Tuxtla</h1>
+                    <p class="text-[11px] text-amber-100 italic flex items-center gap-2 mt-0.5">
+                        <span>Módulo Operativo: Eje 1 - Gobernar con Capacidad</span>
+                        <img src="../img/3.png" alt="¡Capaz de Resolver!" class="h-3.5 object-contain inline-block">
+                    </p>
+                </div>
+            </div>
+            <!-- Botones de Navegación y Sesión Segura -->
+            <div class="flex items-center space-x-3">
+                <!-- Botón Dashboard (Visible solo para Admin) -->
+                <a href="../dashboard.html" id="linkDashboard" class="hidden text-xs text-[#7A1C30] bg-white hover:bg-slate-100 font-bold px-3 py-1.5 rounded transition shadow-sm">← Dashboard</a>
+                
+                <!-- Insignia del Usuario Conectado -->
+                <div class="hidden sm:flex items-center space-x-1.5 bg-[#521220]/60 border border-white/10 px-3 py-1.5 rounded text-xs">
+                    <span class="text-amber-300">👤</span>
+                    <span id="labelUsuarioNavbar" class="font-bold text-white tracking-wide">Cargando...</span>
+                </div>
+
+                <!-- Botón Cerrar Sesión -->
+                <button type="button" onclick="window.cerrarSesionBD()" class="text-xs text-white bg-[#521220] hover:bg-red-900 border border-white/20 font-bold px-3 py-1.5 rounded transition shadow-sm">
+                    Cerrar Sesión 🚪
+                </button>
+            </div>
+
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 py-8 space-y-8">
+        
+        <!-- Formulario de Captura Conforme a Matriz PMD -->
+        <div class="gob-card p-6 bg-white border border-slate-200 shadow-sm space-y-6">
+            <div class="border-b border-slate-100 pb-4 flex justify-between items-center">
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h2 id="tituloFormulario" class="text-base font-bold text-slate-900">Registro de Avance Físico y Proyecciones — Eje 1 (PMD 2026–2029)</h2>
+                        <button type="button" onclick="window.abrirModalAyudaPMD()" class="w-6 h-6 rounded-full bg-[#7A1C30]/10 text-[#7A1C30] hover:bg-[#7A1C30] hover:text-white font-bold text-xs flex items-center justify-center transition shadow-sm" title="Ver matriz oficial de alineación del manual PMD y Plan Veracruzano">
+                            ?
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-500">Gobernación, seguridad ciudadana, control interno, transparencia y administración pública.</p>
+                </div>
+                <span id="badgeEstatusForm" class="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded text-xs font-semibold">
+                    Estatus: En Captura
+                </span>
+            </div>
+
+            <form id="formGobernacion" onsubmit="window.guardarOActualizarRegistro(event)" class="space-y-6">
+                
+                <!-- Campo oculto para almacenar el ID cuando se edita un registro existente -->
+                <input type="hidden" id="editReportId" value="">
+
+                <!-- Selector de Estrategia PMD -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Estrategia PMD (Eje 1 - Gobernar con Capacidad)</label>
+                        <select id="selectPrograma" onchange="window.actualizarMetaOficial()" class="w-full text-xs border border-slate-300 rounded-md p-2.5 bg-slate-50 text-slate-800 font-medium focus:ring-1 focus:ring-[#7A1C30]">
+                            <option value="Estrategia 01" data-desc="Administración financiera con resultados y fiscalización">01: Administración financiera con resultados</option>
+                            <option value="Estrategia 02" data-desc="Modernización administrativa con el uso de tecnología">02: Modernización administrativa con el uso de tecnología</option>
+                            <option value="Estrategia 03" data-desc="Impulso a la planeación y organización municipal">03: Impulso a la planeación y organización municipal</option>
+                            <option value="Estrategia 04" data-desc="Actualización del marco normativo y asuntos jurídicos">04: Actualización del marco normativo y asuntos jurídicos</option>
+                            <option value="Estrategia 05" data-desc="Fomento de la participación ciudadana">05: Fomento de la participación ciudadana</option>
+                            <option value="Estrategia 06" data-desc="Profesionalización de los servidores públicos">06: Profesionalización de los servidores públicos</option>
+                            <option value="Estrategia 07" data-desc="Seguridad Pública y Prevención del Delito">07: Seguridad Pública</option>
+                            <option value="Estrategia 08" data-desc="Tránsito y Vialidad">08: Tránsito y Vialidad</option>
+                            <option value="Estrategia 09" data-desc="Protección Civil">09: Protección Civil</option>
+                            <option value="Estrategia 10" data-desc="Control y vigilancia interna">10: Control y vigilancia interna</option>
+                            <option value="Estrategia 11" data-desc="Transparencia y acceso a la información pública">11: Transparencia y acceso a la información pública</option>
+                            <option value="Estrategia 12" data-desc="Asociación y vinculación institucional">12: Asociación y vinculación institucional</option>
+                            <option value="Estrategia 13" data-desc="Gobierno Abierto">13: Gobierno Abierto</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Descripción del Indicador de Desempeño</label>
+                        <input type="text" id="inputIndicadorText" value="Administración financiera con resultados y fiscalización" readonly class="w-full text-xs bg-slate-100 border border-slate-200 rounded-md p-2.5 text-slate-600">
+                    </div>
+                </div>
+
+                <!-- Campos de Metas Libres -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Meta Programada (Proyección POA)</label>
+                        <input type="number" id="inputMetaProgramada" placeholder="Ej. 10" required oninput="window.calcularIndiceInterno()" class="w-full text-xs border border-slate-300 rounded-md p-2.5 text-slate-900 font-bold focus:ring-1 focus:ring-[#7A1C30]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Meta Realizada en Campo</label>
+                        <input type="number" id="inputMetaAlcanzada" placeholder="Ej. 8" required oninput="window.calcularIndiceInterno()" class="w-full text-xs border border-slate-300 rounded-md p-2.5 text-slate-900 focus:ring-1 focus:ring-[#7A1C30]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">% Cumplimiento Calculado (IE)</label>
+                        <div id="boxCalculoIE" class="text-xs font-bold text-slate-400 bg-slate-50 p-2.5 rounded border border-slate-200 text-center">
+                            0.0%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Área / Sector</label>
+                        <input type="text" id="inputLocalidad" placeholder="Ej. Cabecera Municipal y Cuadrantes" required class="w-full text-xs border border-slate-300 rounded-md p-2.5 text-slate-900 focus:ring-1 focus:ring-[#7A1C30]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Descripción de la Actividad / Observaciones</label>
+                        <input type="text" id="inputDescripcion" placeholder="Ej. Operativo de proximidad social y vigilancia coordinada..." required class="w-full text-xs border border-slate-300 rounded-md p-2.5 text-slate-900 focus:ring-1 focus:ring-[#7A1C30]">
+                    </div>
+                </div>
+
+                <!-- 🌐 DOS COLUMNAS SEPARADAS: FOTOS (IZQ) Y PDF (DER) -->
+                <div class="border-t border-slate-100 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- COLUMNA 1: SUBIR FOTOGRAFÍAS -->
+                    <div class="space-y-3 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                <span>🖼️</span> 1. Evidencia Fotográfica (Mín. 5 Fotos)
+                            </label>
+                            <span id="contadorFotos" class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                                0 / 5 Fotos
+                            </span>
+                        </div>
+                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-4 bg-white text-center relative hover:bg-slate-50 transition cursor-pointer">
+                            <input type="file" id="inputFotoFile" accept="image/*" multiple onchange="window.previewMultipleImagenesBase64(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                            <p class="text-xs text-slate-600 font-medium">📷 Clic o arrastra las fotos de campo</p>
+                        </div>
+                        <!-- Galería en miniatura dentro de la columna -->
+                        <div id="galeriaPreviewBox" class="hidden grid grid-cols-3 gap-2 pt-2"></div>
+                    </div>
+
+                    <!-- COLUMNA 2: CARGAR DOCUMENTO PDF -->
+                    <div class="space-y-3 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                <span>📥</span> 2. Documento Oficial PDF (Opcional)
+                            </label>
+                            <span class="text-[10px] font-semibold text-slate-400">Máx. 900 KB</span>
+                        </div>
+                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-4 bg-white text-center relative hover:bg-slate-50 transition cursor-pointer">
+                            <input type="file" id="inputPdfFile" accept="application/pdf" onchange="window.previewPdfBase64(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                            <p class="text-xs text-slate-600 font-medium">📄 Clic o arrastra el PDF oficial firmado</p>
+                        </div>
+                        <div id="previewBoxPdf" class="hidden flex items-center justify-between bg-white p-2.5 rounded-md border border-slate-200 mt-2">
+                            <div class="flex items-center space-x-2 overflow-hidden">
+                                <span class="text-lg">📄</span>
+                                <p id="nombrePdfPreview" class="text-xs font-bold text-slate-700 truncate"></p>
+                            </div>
+                            <button type="button" onclick="window.quitarPdfSeleccionado()" class="text-rose-600 hover:text-rose-800 font-bold text-xs px-2 py-1">✕</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="flex justify-end space-x-3 border-t border-slate-100 pt-4">
+                    <button type="button" id="btnCancelarEdicion" onclick="window.cancelarEdicion()" class="hidden px-4 py-2.5 text-xs font-bold text-slate-700 bg-slate-200 hover:bg-slate-300 rounded shadow-sm transition">
+                        Cancelar Edición
+                    </button>
+                    <button type="submit" id="btnGuardar" class="px-5 py-2.5 text-xs font-bold text-white bg-[#7A1C30] hover:bg-[#521220] rounded shadow-sm transition flex items-center space-x-2">
+                        <span id="textoBotonGuardar">Guardar y Sincronizar en Firebase</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabla de Registros Guardados -->
+        <div class="gob-card p-6 bg-white border border-slate-200 shadow-sm space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900">Historial de Reportes y Evidencias — Eje 1</h3>
+                    <p class="text-xs text-slate-500">Revise sus registros, edite, descargue documentos PDF, explore el carrusel fotográfico y verifique observaciones.</p>
+                </div>
+                <div class="w-full md:w-64">
+                    <input type="text" id="inputBuscarDept" onkeyup="window.filtrarTablaDept()" placeholder="🔍 Buscar..." class="w-full text-xs border border-slate-300 rounded-md p-2 bg-slate-50">
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
+                            <th class="p-3">Programa / Estrategia</th>
+                            <th class="p-3">Área / Sector y Descripción</th>
+                            <th class="p-3 text-center">Metas (Prog/Real)</th>
+                            <th class="p-3 text-center">% IE</th>
+                            <th class="p-3 text-center">Evidencia (Foto / PDF)</th>
+                            <th class="p-3">Estatus y Comentarios</th>
+                            <th class="p-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyDept" class="divide-y divide-slate-100 text-xs text-slate-700">
+                        <tr><td colspan="7" class="p-6 text-center text-slate-400 italic">Cargando registros...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CARRUSEL INTERACTIVO DE FOTOGRAFÍAS -->
+    <div id="modalCarrusel" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="relative max-w-4xl w-full bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 p-6 flex flex-col items-center space-y-4">
+            <div class="w-full flex justify-between items-center border-b border-slate-800 pb-3">
+                <div>
+                    <h3 id="carruselTitulo" class="text-sm font-bold text-white">Evidencia Fotográfica de Campo</h3>
+                    <p id="carruselSubtitulo" class="text-[11px] text-amber-300 italic">Inspección de avance institucional</p>
+                </div>
+                <button type="button" onclick="window.cerrarCarrusel()" class="text-slate-400 hover:text-white font-bold text-xl px-2 py-1">✕ Cerrar</button>
+            </div>
+            <div class="relative w-full h-[60vh] flex items-center justify-center bg-black/50 rounded-xl overflow-hidden border border-slate-800">
+                <button type="button" onclick="window.cambiarFotoCarrusel(-1)" class="absolute left-3 z-10 bg-black/70 hover:bg-[#7A1C30] text-white p-3 rounded-full font-bold text-base transition shadow-lg">❮</button>
+                <img id="carruselImagenActiva" class="max-h-full max-w-full object-contain transition-all duration-300 rounded-lg shadow-xl" alt="Evidencia">
+                <button type="button" onclick="window.cambiarFotoCarrusel(1)" class="absolute right-3 z-10 bg-black/70 hover:bg-[#7A1C30] text-white p-3 rounded-full font-bold text-base transition shadow-lg">❯</button>
+            </div>
+            <div class="w-full flex justify-between items-center pt-2 border-t border-slate-800 text-xs text-slate-400">
+                <span id="carruselContador" class="font-bold text-amber-200">Foto 1 de 5</span>
+                <span class="italic text-[11px]">Use las flechas laterales para navegar entre las evidencias de campo.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Ayuda / Matriz del Manual -->
+    <div id="modalAyudaPMD" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-5xl w-full p-6 space-y-4 border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-lg bg-[#7A1C30] text-white flex items-center justify-center font-bold text-base shadow-sm">📖</div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">Manual Normativo y Matriz de Alineación Oficial (PMD & Plan Veracruzano)</h3>
+                        <p class="text-[11px] text-slate-500">Consulte la matriz institucional, visualice el manual o descárguelo en PDF.</p>
+                    </div>
+                </div>
+                <button type="button" onclick="window.cerrarModalAyudaPMD()" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 py-1">✕</button>
+            </div>
+            
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div class="flex items-center space-x-2 text-xs text-slate-700 font-medium">
+                    <span>📚</span>
+                    <span>Documento rector del Plan Municipal de Desarrollo 2026-2029</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button type="button" onclick="window.verImagenManual()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-bold transition flex items-center gap-1">
+                        🖼️ Ver Imagen del Manual
+                    </button>
+                    <a href="#" onclick="window.descargarManualPDF(event)" class="px-3 py-1.5 bg-[#7A1C30] text-white hover:bg-[#521220] rounded text-xs font-bold transition shadow-sm flex items-center gap-1">
+                        📥 Descargar Manual Oficial (PDF)
+                    </a>
+                </div>
+            </div>
+
+            <div class="overflow-y-auto pr-1 flex-1 border border-slate-200 rounded-lg">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-[#7A1C30] text-white text-[11px] font-bold uppercase text-center">
+                            <th class="p-3 border-r border-[#521220] w-1/3">Plan Municipal de Desarrollo 2026-2029</th>
+                            <th class="p-3 border-r border-[#521220] w-1/3">Eje / Objetivo (Plan Veracruzano de Desarrollo)</th>
+                            <th class="p-3 w-1/3">Estrategia Estatal Relacionada</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-slate-700 align-top">
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 font-semibold text-[#7A1C30] border-r">
+                                <span class="block font-bold mb-1 text-slate-900">Eje 1: Gobernar con Capacidad</span>
+                                Estrategias 01 a 13: Finanzas, Tecnología, Planeación, Gobernación, Seguridad, Transparencia.
+                            </td>
+                            <td class="p-3 border-r">
+                                <strong class="text-slate-900 block mb-1">Eje Transversal 5 y Eje Rector 4</strong>
+                                Gobierno Honesto, Transparente, Digital, Gobernanza y Seguridad Integral.
+                            </td>
+                            <td class="p-3">
+                                <p><strong>5.1 - 5.6</strong> Modernización, fiscalización y control del gasto público.</p>
+                                <p><strong>4.2 - 4.4</strong> Seguridad ciudadana, prevención del delito y protección civil.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-between items-center pt-2 border-t border-slate-200">
+                <span class="text-[11px] text-slate-500 italic">* Fuente: Plan Municipal de Desarrollo 2026-2029.</span>
+                <button type="button" onclick="window.cerrarModalAyudaPMD()" class="px-4 py-2 text-xs text-white bg-[#7A1C30] hover:bg-[#521220] rounded-md font-semibold transition shadow-sm">Entendido, cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Visor de Imagen en Pantalla Completa (Lightbox) -->
+    <div id="modalImagen" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4" onclick="window.cerrarImagenCompleta()">
+        <div class="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center p-2" onclick="event.stopPropagation()">
+            <button type="button" onclick="window.cerrarImagenCompleta()" class="absolute -top-10 right-0 text-white hover:text-amber-400 text-2xl font-bold px-3 py-1">✕ Cerrar</button>
+            <img id="imgCompleta" class="max-h-[80vh] max-w-full object-contain rounded-lg shadow-2xl border border-white/20">
+            <p id="imgPieTitulo" class="text-xs text-slate-300 mt-3 font-medium bg-slate-900/80 px-4 py-1.5 rounded-full border border-white/10"></p>
+        </div>
+    </div>
+
+    <!-- Modal Confirmación Eliminación -->
+    <div id="modalEliminar" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-200 text-center">
+            <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto text-xl font-bold border border-rose-200">⚠️</div>
+            <div class="space-y-1">
+                <h3 class="text-sm font-bold text-slate-900">¿Eliminar Registro?</h3>
+                <p class="text-xs text-slate-500">Esta acción borrará permanentemente el reporte de Firestore.</p>
+            </div>
+            <input type="hidden" id="deleteDocId">
+            <div class="flex justify-center space-x-3 pt-2">
+                <button type="button" onclick="window.cerrarModalEliminar()" class="px-4 py-2 text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-md font-semibold transition">Cancelar</button>
+                <button type="button" onclick="window.ejecutarEliminacionBD()" class="px-4 py-2 text-xs text-white bg-rose-700 hover:bg-rose-800 rounded-md font-semibold shadow-sm transition">Sí, Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de la página -->
+    <script src="../js/app.js"></script>
+    <script>
+        let fotosEvidenciaArray = [];
+        let pdfBase64 = "";
+        let nombrePdf = "";
+        let reportesLocales = [];
+        
+        let carruselFotosActuales = [];
+        let carruselIndiceActual = 0;
+
+        function mostrarNotificacion(mensaje, tipo = 'exito') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bgColor = tipo === 'exito' ? 'bg-emerald-900/95 text-white' : 'bg-rose-900/95 text-white';
+            toast.className = `pointer-events-auto px-4 py-3 rounded-lg shadow-xl text-xs font-semibold transition-all ${bgColor}`;
+            toast.innerHTML = `<span>${mensaje}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        const tipoUsuario = localStorage.getItem("tipoUsuario");
+        const sesion = JSON.parse(localStorage.getItem("sesion_pmd_sat") || "{}");
+        
+        // 1. Mostrar el nombre o departamento del usuario junto al botón de cerrar sesión
+        const labelNavbar = document.getElementById('labelUsuarioNavbar');
+        if (labelNavbar) {
+            const nombreMostrar = sesion.nombreDep || sesion.usuario || "Operativo";
+            labelNavbar.innerText = nombreMostrar.toUpperCase();
+        }
+
+        // 2. Control dinámico del botón Dashboard (Visible solo si es Admin)
+        const linkDashboard = document.getElementById('linkDashboard');
+        if (linkDashboard) {
+            if (tipoUsuario === 'admin') {
+                linkDashboard.classList.remove('hidden');
+            } else {
+                linkDashboard.classList.add('hidden');
+            }
+        }
+
+        if (typeof obtenerReportesBD === 'function') cargarTablaRegistros();
+    }, 500);
+});
+
+        window.abrirModalAyudaPMD = () => document.getElementById('modalAyudaPMD').classList.remove('hidden');
+        window.cerrarModalAyudaPMD = () => document.getElementById('modalAyudaPMD').classList.add('hidden');
+
+        window.verImagenManual = function() {
+            const srcImg = "../img/manual_pmd_ref.png";
+            document.getElementById('imgCompleta').src = srcImg;
+            document.getElementById('imgPieTitulo').innerText = "Manual Normativo y Matriz Oficial PMD 2026-2029";
+            document.getElementById('modalImagen').classList.remove('hidden');
+        };
+
+        window.descargarManualPDF = function(e) {
+            e.preventDefault();
+            const urlPdf = "../docs/Manual_PMD_2026_2029.pdf";
+            const a = document.createElement('a');
+            a.href = urlPdf;
+            a.download = "Manual_Oficial_PMD_SanAndresTuxtla.pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            mostrarNotificacion("Descargando manual oficial en PDF...", "exito");
+        };
+
+        window.previewMultipleImagenesBase64 = function(event) {
+            const files = Array.from(event.target.files);
+            files.forEach(file => {
+                procesarArchivoEvidencia({ files: [file] }, function(base64String, fileName) {
+                    fotosEvidenciaArray.push({ base64: base64String, nombre: fileName });
+                    renderizarGaleriaPreview();
+                });
+            });
+        };
+
+        function renderizarGaleriaPreview() {
+            const container = document.getElementById('galeriaPreviewBox');
+            const contador = document.getElementById('contadorFotos');
+            container.innerHTML = "";
+            container.classList.toggle('hidden', fotosEvidenciaArray.length === 0);
+
+            fotosEvidenciaArray.forEach((foto, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "relative group rounded border bg-white p-1 shadow-sm";
+                itemDiv.innerHTML = `
+                    <img src="${foto.base64}" class="h-16 w-full object-cover rounded cursor-pointer">
+                    <button type="button" onclick="window.quitarFotoGaleria(${index})" class="absolute -top-1.5 -right-1.5 bg-rose-700 text-white font-bold text-[9px] w-4 h-4 rounded-full flex items-center justify-center">✕</button>
+                `;
+                container.appendChild(itemDiv);
+            });
+            contador.innerText = `${fotosEvidenciaArray.length} / 5 Fotos`;
+            contador.className = fotosEvidenciaArray.length >= 5 ? "text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200" : "text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200";
+        }
+
+        window.quitarFotoGaleria = (index) => { fotosEvidenciaArray.splice(index, 1); renderizarGaleriaPreview(); };
+
+        window.previewPdfBase64 = function(event) {
+            procesarArchivoEvidencia(event.target, function(base64String, fileName) {
+                pdfBase64 = base64String;
+                nombrePdf = fileName;
+                document.getElementById('previewBoxPdf').classList.remove('hidden');
+                document.getElementById('nombrePdfPreview').innerText = fileName;
+            });
+        };
+
+        window.quitarPdfSeleccionado = () => { pdfBase64 = ""; nombrePdf = ""; document.getElementById('previewBoxPdf').classList.add('hidden'); };
+
+        window.actualizarMetaOficial = function() {
+            const select = document.getElementById('selectPrograma');
+            document.getElementById('inputIndicadorText').value = select.options[select.selectedIndex].getAttribute('data-desc');
+            window.calcularIndiceInterno();
+        };
+
+        window.calcularIndiceInterno = function() {
+            const programada = parseFloat(document.getElementById('inputMetaProgramada').value) || 0;
+            const alcanzada = parseFloat(document.getElementById('inputMetaAlcanzada').value) || 0;
+            if (programada > 0 && typeof calcularIndiceCumplimiento === 'function') {
+                const res = calcularIndiceCumplimiento(programada, alcanzada);
+                const box = document.getElementById('boxCalculoIE');
+                box.innerText = res.porcentaje + '% (' + res.nivel.toUpperCase() + ')';
+                box.className = 'text-xs font-bold p-2.5 rounded border text-center ' + res.clase;
+            } else {
+                const box = document.getElementById('boxCalculoIE');
+                box.innerText = '0.0%';
+                box.className = 'text-xs font-bold text-slate-400 bg-slate-50 p-2.5 rounded border border-slate-200 text-center';
+            }
+        };
+
+        window.guardarOActualizarRegistro = async function(e) {
+            e.preventDefault();
+            if (fotosEvidenciaArray.length < 5) {
+                mostrarNotificacion("Se requieren mínimo 5 fotografías de evidencia de campo.", "error");
+                return;
+            }
+
+            const editId = document.getElementById('editReportId').value;
+            const select = document.getElementById('selectPrograma');
+            const metaProg = document.getElementById('inputMetaProgramada').value;
+            const metaAlcanzada = document.getElementById('inputMetaAlcanzada').value;
+            let porcentajeCalc = calcularIndiceCumplimiento ? calcularIndiceCumplimiento(metaProg, metaAlcanzada).porcentaje + "%" : "0%";
+
+            const datosReporte = {
+                dependencia: "Eje 1: Gobernar con Capacidad",
+                eje: "Eje 1: Gobernar con Capacidad",
+                programa: select.options[select.selectedIndex].text,
+                metaProgramada: metaProg,
+                metaAlcanzada: metaAlcanzada,
+                porcentajeIE: porcentajeCalc,
+                localidad: document.getElementById('inputLocalidad').value,
+                descripcion: document.getElementById('inputDescripcion').value,
+                fotosEvidencia: fotosEvidenciaArray,
+                documentoPdfBase64: pdfBase64,
+                documentoPdfNombre: nombrePdf || "Documento_Oficial.pdf",
+                estatusAuditoria: "En Revisión",
+                comentariosAuditoria: editId ? "Reporte actualizado y enviado para reevaluación." : "Reporte enviado para validación institucional."
+            };
+
+            if (editId) {
+                const resultado = await actualizarReporteBD(editId, datosReporte);
+                if (resultado && resultado.exito) {
+                    mostrarNotificacion("¡Reporte actualizado con éxito!", "exito");
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    mostrarNotificacion("Error al actualizar el registro.", "error");
+                }
+            } else {
+                const resultado = await guardarReporteBD(datosReporte);
+                if (resultado && resultado.exito) {
+                    mostrarNotificacion("¡Reporte guardado con éxito en Firebase!", "exito");
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    mostrarNotificacion("Error al registrar en la base de datos.", "error");
+                }
+            }
+        };
+
+        window.cargarDatosEdicion = function(id) {
+            const item = reportesLocales.find(r => r.id === id);
+            if (!item) return;
+
+            document.getElementById('editReportId').value = item.id;
+            document.getElementById('inputMetaProgramada').value = item.metaProgramada;
+            document.getElementById('inputMetaAlcanzada').value = item.metaAlcanzada;
+            document.getElementById('inputLocalidad').value = item.localidad || '';
+            document.getElementById('inputDescripcion').value = item.descripcion || '';
+
+            const select = document.getElementById('selectPrograma');
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].text === item.programa) {
+                    select.selectedIndex = i;
+                    break;
+                }
+            }
+            window.actualizarMetaOficial();
+
+            fotosEvidenciaArray = item.fotosEvidencia || [];
+            renderizarGaleriaPreview();
+
+            if (item.documentoPdfBase64) {
+                pdfBase64 = item.documentoPdfBase64;
+                nombrePdf = item.documentoPdfNombre || "Documento.pdf";
+                document.getElementById('previewBoxPdf').classList.remove('hidden');
+                document.getElementById('nombrePdfPreview').innerText = nombrePdf;
+            }
+
+            document.getElementById('tituloFormulario').innerText = "Editando Registro de Avance — Eje 1";
+            document.getElementById('badgeEstatusForm').innerText = "Estatus: En Edición";
+            document.getElementById('textoBotonGuardar').innerText = "Actualizar Registro en Firebase";
+            document.getElementById('btnCancelarEdicion').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            mostrarNotificacion("Modo edición activado.", "exito");
+        };
+
+        window.cancelarEdicion = function() { location.reload(); };
+
+               async function cargarTablaRegistros() {
+            const tbody = document.getElementById('tbodyDept');
+            const todos = await obtenerReportesBD();
+            reportesLocales = todos.filter(r => r.dependencia === "Eje 1: Gobernar con Capacidad" || r.eje === "Eje 1: Gobernar con Capacidad" || r.dependencia === "Gobernación y Seguridad Pública");
+
+            if (reportesLocales.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 italic">No hay registros guardados.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = "";
+            reportesLocales.forEach((item, index) => {
+                // --- EVIDENCIAS: SOLO ICONO BOOTSTRAP DE FOTOS Y BOTÓN PDF OFICIAL ---
+                let numFotos = item.fotosEvidencia?.length || (item.evidenciaBase64 ? 1 : 0);
+                let tieneFotos = (item.fotosEvidencia && item.fotosEvidencia.length > 0) || item.evidenciaBase64;
+
+                let evidenciasHtml = '<div class="flex items-center justify-center gap-3">';
+                
+                // Botón de Fotografías con Icono Bootstrap (sin miniatura)
+                if (tieneFotos) {
+                    evidenciasHtml += `
+                        <button type="button" onclick="window.abrirCarruselReporte(${index})" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-[#7A1C30] border border-slate-300 rounded-lg text-[10px] font-bold inline-flex flex-col items-center gap-0.5 transition shadow-sm" title="Ver carrusel de ${numFotos} fotos">
+                            <i class="bi bi-images text-base"></i>
+                            <span>Ver ${numFotos} fotos</span>
+                        </button>
+                    `;
+                } else {
+                    evidenciasHtml += `<span class="text-slate-400 italic text-[11px]">Sin fotos</span>`;
+                }
+
+                // Botón de PDF con Icono Bootstrap (file-earmark-pdf) y texto Descargar
+                if (item.documentoPdfBase64) {
+                    evidenciasHtml += `
+                        <a href="${item.documentoPdfBase64}" download="${item.documentoPdfNombre || 'Documento.pdf'}" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-[10px] font-bold inline-flex flex-col items-center gap-0.5 transition shadow-sm" title="Descargar documento PDF oficial">
+                            <i class="bi bi-file-earmark-pdf text-base"></i>
+                            <span>Descargar</span>
+                        </a>
+                    `;
+                }
+                evidenciasHtml += '</div>';
+
+                let estatusColor = "bg-amber-50 text-amber-700 border-amber-200";
+                let estatusText = item.estatusAuditoria || "En Revisión";
+                if (estatusText === "Aprobado") estatusColor = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                if (estatusText === "Corrección") estatusColor = "bg-rose-50 text-rose-700 border-rose-200";
+
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 border-b align-top";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium">${item.programa}</td>
+                    <td class="p-3 space-y-0.5">
+                        <p class="font-bold text-slate-900">${item.localidad || 'N/A'}</p>
+                        <p class="text-[11px] text-slate-500 italic">"${item.descripcion || 'Sin descripción'}"</p>
+                    </td>
+                    <td class="p-3 text-center font-semibold">${item.metaProgramada} / ${item.metaAlcanzada}</td>
+                    <td class="p-3 text-center font-bold text-[#7A1C30]">${item.porcentajeIE}</td>
+                    <td class="p-3 text-center">${evidenciasHtml}</td>
+                    <td class="p-3 space-y-1">
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${estatusColor}">${estatusText}</span>
+                        <p class="text-[11px] text-slate-700 font-medium bg-amber-50/50 p-1.5 rounded border border-amber-100">💬 "${item.comentariosAuditoria || 'Sin observaciones del dashboard.'}"</p>
+                    </td>
+                    <td class="p-3 text-right space-y-1">
+                        <button type="button" onclick="window.cargarDatosEdicion('${item.id}')" class="block w-full px-2 py-1 bg-amber-50 text-amber-800 rounded text-[11px] font-semibold hover:bg-amber-100 text-center">Editar</button>
+                        <button type="button" onclick="confirmarEliminar('${item.id}')" class="block w-full px-2 py-1 bg-rose-50 text-rose-700 rounded text-[11px] font-semibold hover:bg-rose-100 text-center">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.abrirCarruselReporte = function(index) {
+            const item = reportesLocales[index];
+            carruselFotosActuales = [];
+
+            if (item.fotosEvidencia && item.fotosEvidencia.length > 0) {
+                carruselFotosActuales = item.fotosEvidencia.map(f => f.base64);
+            } else if (item.evidenciaBase64) {
+                carruselFotosActuales = [item.evidenciaBase64];
+            }
+
+            if (carruselFotosActuales.length === 0) {
+                mostrarNotificacion("Este reporte no contiene fotografías.", "error");
+                return;
+            }
+
+            carruselIndiceActual = 0;
+            document.getElementById('carruselTitulo').innerText = `Reporte: ${item.programa}`;
+            document.getElementById('carruselSubtitulo').innerText = `Área: ${item.localidad || 'N/A'}`;
+            
+            actualizarImagenCarrusel();
+            document.getElementById('modalCarrusel').classList.remove('hidden');
+        };
+
+        window.cambiarFotoCarrusel = function(dir) {
+            carruselIndiceActual += dir;
+            if (carruselIndiceActual < 0) carruselIndiceActual = carruselFotosActuales.length - 1;
+            if (carruselIndiceActual >= carruselFotosActuales.length) carruselIndiceActual = 0;
+            actualizarImagenCarrusel();
+        };
+
+        function actualizarImagenCarrusel() {
+            document.getElementById('carruselImagenActiva').src = carruselFotosActuales[carruselIndiceActual];
+            document.getElementById('carruselContador').innerText = `Foto ${carruselIndiceActual + 1} de ${carruselFotosActuales.length}`;
+        }
+
+        window.cerrarCarrusel = () => document.getElementById('modalCarrusel').classList.add('hidden');
+        window.verImagenCompleta = (src, titulo) => {
+            document.getElementById('imgCompleta').src = src;
+            document.getElementById('imgPieTitulo').innerText = titulo;
+            document.getElementById('modalImagen').classList.remove('hidden');
+        };
+        window.cerrarImagenCompleta = () => document.getElementById('modalImagen').classList.add('hidden');
+
+        window.confirmarEliminar = (id) => { document.getElementById('deleteDocId').value = id; document.getElementById('modalEliminar').classList.remove('hidden'); };
+        window.cerrarModalEliminar = () => document.getElementById('modalEliminar').classList.add('hidden');
+        window.ejecutarEliminacionBD = async function() {
+            const id = document.getElementById('deleteDocId').value;
+            window.cerrarModalEliminar();
+            const res = await eliminarReporteBD(id);
+            if (res && res.exito) { mostrarNotificacion("Registro eliminado.", "exito"); setTimeout(() => location.reload(), 800); }
+        };
+
+        window.filtrarTablaDept = function() {
+            const q = document.getElementById('inputBuscarDept').value.toUpperCase();
+            document.querySelectorAll('#tbodyDept tr').forEach(row => {
+                row.style.display = row.innerText.toUpperCase().includes(q) ? '' : 'none';
+            });
+        };
+    </script>
+</body>
+</html>

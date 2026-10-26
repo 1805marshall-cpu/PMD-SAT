@@ -1,0 +1,36 @@
+/* ==========================================================================
+   ESTILOS INSTITUCIONALES - GOBIERNO MUNICIPAL DE SAN ANDRÉS TUXTLA
+   ========================================================================== */
+
+:root {
+    --gob-guinda: #7A1C30;
+    --gob-guinda-dark: #521220;
+    --gob-dorado: #C5A059;
+    --gob-slate: #0f172a;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+}
+
+/* Tarjetas y Contenedores */
+.gob-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Botones Institucionales */
+.btn-gob-primary {
+    background-color: var(--gob-guinda);
+    color: #ffffff;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.btn-gob-primary:hover {
+    background-color: var(--gob-guinda-dark);
+}
