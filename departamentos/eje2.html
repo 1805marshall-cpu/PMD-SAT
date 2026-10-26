@@ -136,10 +136,10 @@
                     <div class="space-y-3 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
                         <div class="flex justify-between items-center">
                             <label class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                                <i class="bi bi-images text-[#7A1C30]"></i> 1. Evidencia Fotográfica (Mín. 5 Fotos)
+                                <i class="bi bi-images text-[#7A1C30]"></i> 1. Evidencia Fotográfica (Mín. 1 Foto)
                             </label>
                             <span id="contadorFotos" class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-                                0 / 5 Fotos
+                                0 / 1 Fotos Mínimo
                             </span>
                         </div>
                         <div class="border-2 border-dashed border-slate-300 rounded-lg p-4 bg-white text-center relative hover:bg-slate-50 transition cursor-pointer">
@@ -464,8 +464,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 container.appendChild(itemDiv);
             });
-            contador.innerText = `${fotosEvidenciaArray.length} / 5 Fotos`;
-            contador.className = fotosEvidenciaArray.length >= 5 ? "text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200" : "text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200";
+            // Validación para marcar en verde si ya cumple con al menos 1 foto
+            contador.innerText = `${fotosEvidenciaArray.length} Foto(s) cargada(s)`;
+            contador.className = fotosEvidenciaArray.length >= 1 ? "text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200" : "text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200";
         }
 
         window.quitarFotoGaleria = (index) => { fotosEvidenciaArray.splice(index, 1); renderizarGaleriaPreview(); };
@@ -501,14 +502,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 box.className = 'text-xs font-bold text-slate-400 bg-slate-50 p-2.5 rounded border border-slate-200 text-center';
             }
         };
-
         window.guardarOActualizarRegistro = async function(e) {
             e.preventDefault();
-            if (fotosEvidenciaArray.length < 5) {
-                mostrarNotificacion("Se requieren mínimo 5 fotografías de evidencia de campo.", "error");
+            // 📸 Ahora se exige un mínimo de 1 fotografía en lugar de 5
+            if (fotosEvidenciaArray.length < 1) {
+                mostrarNotificacion("Se requiere mínimo 1 fotografía de evidencia de campo.", "error");
                 return;
             }
-
+            // ... resto del código de guardado ...
             const editId = document.getElementById('editReportId').value;
             const select = document.getElementById('selectPrograma');
             const metaProg = document.getElementById('inputMetaProgramada').value;
