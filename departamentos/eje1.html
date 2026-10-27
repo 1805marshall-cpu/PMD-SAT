@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-
     <!-- Firebase SDKs versión Compat -->
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
@@ -38,18 +37,17 @@
                 <!-- Botón Dashboard (Visible solo para Admin) -->
                 <a href="../dashboard.html" id="linkDashboard" class="hidden text-xs text-[#7A1C30] bg-white hover:bg-slate-100 font-bold px-3 py-1.5 rounded transition shadow-sm">← Dashboard</a>
                 
-                <!-- Insignia del Usuario Conectado -->
-                <div class="hidden sm:flex items-center space-x-1.5 bg-[#521220]/60 border border-white/10 px-3 py-1.5 rounded text-xs">
-                    <span class="text-amber-300">👤</span>
-                    <span id="labelUsuarioNavbar" class="font-bold text-white tracking-wide">Cargando...</span>
+                <!-- Insignia del Usuario Conectado con Candado de Seguridad -->
+                <div class="inline-flex items-center space-x-2 text-xs text-white bg-[#521220]/70 border border-white/20 font-medium px-3 py-1.5 rounded shadow-sm">
+                    <i class="bi bi-shield-lock-fill text-amber-300 text-sm"></i>
+                    <span id="labelUsuarioNavbar" class="font-bold tracking-wide">Cargando...</span>
                 </div>
 
                 <!-- Botón Cerrar Sesión -->
                 <button type="button" onclick="window.cerrarSesionBD()" class="text-xs text-white bg-[#521220] hover:bg-red-900 border border-white/20 font-bold px-3 py-1.5 rounded transition shadow-sm">
-                    Cerrar Sesión 🚪
+                    Cerrar Sesión
                 </button>
             </div>
-
         </div>
     </header>
 
@@ -76,6 +74,67 @@
                 
                 <!-- Campo oculto para almacenar el ID cuando se edita un registro existente -->
                 <input type="hidden" id="editReportId" value="">
+
+                <!-- 📅 SELECCIÓN DE AÑO FISCAL Y CHECKLIST DE MESES -->
+                <div class="space-y-4 bg-slate-50/70 p-5 rounded-xl border border-slate-200">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">🏛️ Año Fiscal / Administración (PMD)</label>
+                            <select id="selectAnioFiscal" required class="w-full text-xs border border-slate-300 rounded-md p-2.5 bg-white text-slate-800 font-medium focus:ring-1 focus:ring-[#7A1C30]">
+                                <option value="2026" selected>2026 (Primer Año)</option>
+                                <option value="2027">2027 (Segundo Año)</option>
+                                <option value="2028">2028 (Tercer Año)</option>
+                                <option value="2029">2029 (Cuarto Año)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end justify-start md:justify-end space-x-4">
+                            <button type="button" onclick="window.seleccionarTodosMeses(true)" class="text-[11px] text-[#7A1C30] hover:underline font-bold">✓ Marcar Todos (Anual)</button>
+                            <button type="button" onclick="window.seleccionarTodosMeses(false)" class="text-[11px] text-slate-500 hover:underline font-bold">✕ Limpiar Meses</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">📅 Seleccione los Meses que abarca este corte de avance:</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 bg-white p-3 rounded-lg border border-slate-200">
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Enero" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Enero</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Febrero" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Febrero</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Marzo" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Marzo</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Abril" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Abril</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Mayo" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Mayo</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Junio" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Junio</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Julio" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Julio</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Agosto" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Agosto</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Septiembre" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Septiembre</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Octubre" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Octubre</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Noviembre" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Noviembre</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
+                                <input type="checkbox" name="mesCheck" value="Diciembre" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Diciembre</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Selector de Estrategia PMD -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -152,7 +211,6 @@
                         <div id="galeriaPreviewBox" class="hidden grid grid-cols-3 gap-2 pt-2"></div>
                     </div>
 
-
                     <!-- COLUMNA 2: CARGAR DOCUMENTO PDF -->
                     <div class="space-y-3 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
                         <div class="flex justify-between items-center">
@@ -193,7 +251,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
                 <div>
                     <h3 class="text-sm font-bold text-slate-900">Historial de Reportes y Evidencias — Eje 1</h3>
-                    <p class="text-xs text-slate-500">Revise sus registros, edite, descargue documentos PDF, explore el carrusel fotográfico y verifique observaciones.</p>
+                    <p class="text-xs text-slate-500">Revise sus registros, edite, descargue documentos PDF, explore el carrusel fotográfico y verifique periodos.</p>
                 </div>
                 <div class="w-full md:w-64">
                     <input type="text" id="inputBuscarDept" onkeyup="window.filtrarTablaDept()" placeholder="🔍 Buscar..." class="w-full text-xs border border-slate-300 rounded-md p-2 bg-slate-50">
@@ -204,7 +262,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
-                            <th class="p-3">Programa / Estrategia</th>
+                            <th class="p-3">Programa / Estrategia y Periodo</th>
                             <th class="p-3">Área / Sector y Descripción</th>
                             <th class="p-3 text-center">Metas (Prog/Real)</th>
                             <th class="p-3 text-center">% IE</th>
@@ -353,31 +411,34 @@
             setTimeout(() => toast.remove(), 2500);
         }
 
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        const tipoUsuario = localStorage.getItem("tipoUsuario");
-        const sesion = JSON.parse(localStorage.getItem("sesion_pmd_sat") || "{}");
-        
-        // 1. Mostrar el nombre o departamento del usuario junto al botón de cerrar sesión
-        const labelNavbar = document.getElementById('labelUsuarioNavbar');
-        if (labelNavbar) {
-            const nombreMostrar = sesion.nombreDep || sesion.usuario || "Operativo";
-            labelNavbar.innerText = nombreMostrar.toUpperCase();
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const tipoUsuario = localStorage.getItem("tipoUsuario");
+                const sesion = JSON.parse(localStorage.getItem("sesion_pmd_sat") || "{}");
+                
+                const labelNavbar = document.getElementById('labelUsuarioNavbar');
+                if (labelNavbar) {
+                    const nombreMostrar = sesion.nombreDep || sesion.usuario || "Operativo";
+                    labelNavbar.innerText = nombreMostrar.toUpperCase();
+                }
 
-        // 2. Control dinámico del botón Dashboard (Visible solo si es Admin)
-        const linkDashboard = document.getElementById('linkDashboard');
-        if (linkDashboard) {
-            if (tipoUsuario === 'admin') {
-                linkDashboard.classList.remove('hidden');
-            } else {
-                linkDashboard.classList.add('hidden');
-            }
-        }
+                const linkDashboard = document.getElementById('linkDashboard');
+                if (linkDashboard) {
+                    if (tipoUsuario === 'admin') {
+                        linkDashboard.classList.remove('hidden');
+                    } else {
+                        linkDashboard.classList.add('hidden');
+                    }
+                }
 
-        if (typeof obtenerReportesBD === 'function') cargarTablaRegistros();
-    }, 500);
-});
+                if (typeof obtenerReportesBD === 'function') cargarTablaRegistros();
+            }, 500);
+        });
+
+        // 🔘 Función para Marcar o Desmarcar Todos los Meses del Checklist
+        window.seleccionarTodosMeses = function(marcar) {
+            document.querySelectorAll('input[name="mesCheck"]').forEach(cb => cb.checked = marcar);
+        };
 
         window.abrirModalAyudaPMD = () => document.getElementById('modalAyudaPMD').classList.remove('hidden');
         window.cerrarModalAyudaPMD = () => document.getElementById('modalAyudaPMD').classList.add('hidden');
@@ -426,11 +487,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 container.appendChild(itemDiv);
             });
-            // Validación para marcar en verde si ya cumple con al menos 1 foto
             contador.innerText = `${fotosEvidenciaArray.length} Foto(s) cargada(s)`;
             contador.className = fotosEvidenciaArray.length >= 1 ? "text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200" : "text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200";
         }
-
 
         window.quitarFotoGaleria = (index) => { fotosEvidenciaArray.splice(index, 1); renderizarGaleriaPreview(); };
 
@@ -468,11 +527,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.guardarOActualizarRegistro = async function(e) {
             e.preventDefault();
-            // 📸 Ahora se exige un mínimo de 1 fotografía en lugar de 5
             if (fotosEvidenciaArray.length < 1) {
                 mostrarNotificacion("Se requiere mínimo 1 fotografía de evidencia de campo.", "error");
                 return;
             }
+
+            // Recolectar meses seleccionados del checklist
+            const mesesSeleccionados = Array.from(document.querySelectorAll('input[name="mesCheck"]:checked'))
+                                              .map(cb => cb.value);
+
+            if (mesesSeleccionados.length === 0) {
+                mostrarNotificacion("Debe seleccionar al menos un mes para el corte de avance.", "error");
+                return;
+            }
+
+            // Formatear texto del periodo según los meses seleccionados
+            let periodoTexto = mesesSeleccionados.length === 1 
+                ? mesesSeleccionados[0] 
+                : `${mesesSeleccionados[0]} a ${mesesSeleccionados[mesesSeleccionados.length - 1]}`;
 
             const editId = document.getElementById('editReportId').value;
             const select = document.getElementById('selectPrograma');
@@ -484,6 +556,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 dependencia: "Eje 1: Gobernar con Capacidad",
                 eje: "Eje 1: Gobernar con Capacidad",
                 programa: select.options[select.selectedIndex].text,
+                mesesArray: mesesSeleccionados, // 📅 Array con meses marcados (ej. ["Enero", "Febrero", "Marzo"])
+                periodoReporte: periodoTexto,   // 📋 Texto legible (ej. "Enero a Marzo")
+                anioFiscal: document.getElementById('selectAnioFiscal').value, // 🏛️ Año fiscal
                 metaProgramada: metaProg,
                 metaAlcanzada: metaAlcanzada,
                 porcentajeIE: porcentajeCalc,
@@ -524,6 +599,25 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('inputMetaAlcanzada').value = item.metaAlcanzada;
             document.getElementById('inputLocalidad').value = item.localidad || '';
             document.getElementById('inputDescripcion').value = item.descripcion || '';
+            
+            // Limpiar checklist primero
+            document.querySelectorAll('input[name="mesCheck"]').forEach(cb => cb.checked = false);
+
+            // Marcar los meses guardados en el checklist
+            if (item.mesesArray && Array.isArray(item.mesesArray)) {
+                item.mesesArray.forEach(mes => {
+                    const cb = document.querySelector(`input[name="mesCheck"][value="${mes}"]`);
+                    if (cb) cb.checked = true;
+                });
+            } else if (item.mesReporte) {
+                const cb = document.querySelector(`input[name="mesCheck"][value="${item.mesReporte}"]`);
+                if (cb) cb.checked = true;
+            }
+
+            // Precargar Año Fiscal
+            if (item.anioFiscal) {
+                document.getElementById('selectAnioFiscal').value = item.anioFiscal;
+            }
 
             const select = document.getElementById('selectPrograma');
             for (let i = 0; i < select.options.length; i++) {
@@ -554,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.cancelarEdicion = function() { location.reload(); };
 
-               async function cargarTablaRegistros() {
+        async function cargarTablaRegistros() {
             const tbody = document.getElementById('tbodyDept');
             const todos = await obtenerReportesBD();
             reportesLocales = todos.filter(r => r.dependencia === "Eje 1: Gobernar con Capacidad" || r.eje === "Eje 1: Gobernar con Capacidad" || r.dependencia === "Gobernación y Seguridad Pública");
@@ -566,13 +660,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             tbody.innerHTML = "";
             reportesLocales.forEach((item, index) => {
-                // --- EVIDENCIAS: SOLO ICONO BOOTSTRAP DE FOTOS Y BOTÓN PDF OFICIAL ---
                 let numFotos = item.fotosEvidencia?.length || (item.evidenciaBase64 ? 1 : 0);
                 let tieneFotos = (item.fotosEvidencia && item.fotosEvidencia.length > 0) || item.evidenciaBase64;
 
                 let evidenciasHtml = '<div class="flex items-center justify-center gap-3">';
                 
-                // Botón de Fotografías con Icono Bootstrap (sin miniatura)
                 if (tieneFotos) {
                     evidenciasHtml += `
                         <button type="button" onclick="window.abrirCarruselReporte(${index})" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-[#7A1C30] border border-slate-300 rounded-lg text-[10px] font-bold inline-flex flex-col items-center gap-0.5 transition shadow-sm" title="Ver carrusel de ${numFotos} fotos">
@@ -584,7 +676,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     evidenciasHtml += `<span class="text-slate-400 italic text-[11px]">Sin fotos</span>`;
                 }
 
-                // Botón de PDF con Icono Bootstrap (file-earmark-pdf) y texto Descargar
                 if (item.documentoPdfBase64) {
                     evidenciasHtml += `
                         <a href="${item.documentoPdfBase64}" download="${item.documentoPdfNombre || 'Documento.pdf'}" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-[10px] font-bold inline-flex flex-col items-center gap-0.5 transition shadow-sm" title="Descargar documento PDF oficial">
@@ -600,10 +691,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (estatusText === "Aprobado") estatusColor = "bg-emerald-50 text-emerald-700 border-emerald-200";
                 if (estatusText === "Corrección") estatusColor = "bg-rose-50 text-rose-700 border-rose-200";
 
+                let periodoVisual = item.periodoReporte || (Array.isArray(item.mesesArray) ? item.mesesArray.join(', ') : item.mesReporte) || 'Periodo N/A';
+
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 border-b align-top";
                 tr.innerHTML = `
-                    <td class="p-3 font-medium">${item.programa}</td>
+                    <td class="p-3 font-medium">
+                        ${item.programa}
+                        <div class="mt-1">
+                            <span class="inline-block bg-amber-100 text-amber-900 px-2 py-0.5 rounded text-[10px] font-bold">📅 ${periodoVisual} (${item.anioFiscal || '2026'})</span>
+                        </div>
+                    </td>
                     <td class="p-3 space-y-0.5">
                         <p class="font-bold text-slate-900">${item.localidad || 'N/A'}</p>
                         <p class="text-[11px] text-slate-500 italic">"${item.descripcion || 'Sin descripción'}"</p>

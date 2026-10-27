@@ -42,7 +42,7 @@
                         📄 Generar Informe COPLADEMUN
                     </a>
                     <button type="button" onclick="window.cerrarSesionBD()" class="text-xs text-white bg-[#521220] hover:bg-red-900 border border-white/20 font-bold px-3 py-1.5 rounded transition shadow-sm">
-                        Cerrar Sesión 🚪
+                        Cerrar Sesión 
                     </button>
                 </div>
                 <div>
@@ -255,7 +255,6 @@
         let paginaActual = 1;
         const registrosPorPagina = 10;
         
-        // Variables globales para el Carrusel
         let carruselFotosActuales = [];
         let carruselIndiceActual = 0;
 
@@ -269,30 +268,29 @@
             setTimeout(() => toast.remove(), 2500);
         }
 
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        // 🔒 Validación estricta de privilegios de Administrador
-        const tipoUsuario = localStorage.getItem('tipoUsuario');
-        const sesion = JSON.parse(localStorage.getItem("sesion_pmd_sat") || "{}");
-
-        if (!tipoUsuario || tipoUsuario !== 'admin') {
-            mostrarNotificacion("⚠️ Acceso restringido. Solo administradores.", "error");
+        document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
-            return;
-        }
+                const tipoUsuario = localStorage.getItem('tipoUsuario');
+                const sesion = JSON.parse(localStorage.getItem("sesion_pmd_sat") || "{}");
 
-        // Mostrar el nombre del departamento o usuario conectado en el header
-        const labelUser = document.getElementById('labelUsuarioConectado');
-        if (labelUser) {
-            labelUser.innerText = sesion.nombreDep || "Administrador General";
-        }
+                if (!tipoUsuario || tipoUsuario !== 'admin') {
+                    mostrarNotificacion("⚠️ Acceso restringido. Solo administradores.", "error");
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                    return;
+                }
 
-        if (typeof verificarSesionActiva === 'function') verificarSesionActiva(true);
-        if (typeof obtenerReportesBD === 'function') cargarBitacoraGlobal();
-    }, 500);
-});
+                const labelUser = document.getElementById('labelUsuarioConectado');
+                if (labelUser) {
+                    labelUser.innerText = sesion.nombreDep || "Administrador General";
+                }
+
+                if (typeof verificarSesionActiva === 'function') verificarSesionActiva(true);
+                if (typeof obtenerReportesBD === 'function') cargarBitacoraGlobal();
+            }, 500);
+        });
+
         async function cargarBitacoraGlobal() {
             if (typeof obtenerReportesBD !== 'function') return;
             todosLosReportesGlobales = await obtenerReportesBD();
@@ -392,14 +390,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     </select>
                 `;
 
-                // Campo de observaciones con autoguardado (onblur)
                 const observacionActual = item.comentariosAuditoria || "";
                 const inputObsHtml = `
                     <textarea rows="2" placeholder="Escribir comentarios..." onblur="window.guardarObservacionReporte('${item.id}', this.value)" class="text-[11px] border border-slate-200 rounded px-2 py-1 w-full bg-slate-50 focus:bg-white focus:ring-1 focus:ring-[#7A1C30] resize-none">${observacionActual}</textarea>
                 `;
 
+                // 📅 Formatear Periodo (Meses) y Año Fiscal
+                let periodoVisual = item.periodoReporte || (Array.isArray(item.mesesArray) ? item.mesesArray.join(', ') : item.mesReporte) || 'Periodo N/A';
+                let anioVisual = item.anioFiscal || '2026';
+
                 tr.innerHTML = `
-                    <td class="p-3 font-semibold text-slate-800">${item.dependencia || 'General'}</td>
+                    <td class="p-3 font-semibold text-slate-800">
+                        ${item.dependencia || 'General'}
+                        <div class="mt-1">
+                            <span class="inline-block bg-amber-100 text-amber-900 px-2 py-0.5 rounded text-[10px] font-bold">📅 ${periodoVisual} (${anioVisual})</span>
+                        </div>
+                    </td>
                     <td class="p-3">${item.programa || item.descripcion || 'Sin descripción'}</td>
                     <td class="p-3 space-y-0.5">
                         <p class="font-bold text-slate-900">${item.localidad || 'N/A'}</p>
@@ -419,7 +425,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('btnSiguiente').disabled = paginaActual === totalPaginas;
         }
 
-        // --- LÓGICA DEL CARRUSEL EN EL DASHBOARD ---
         window.abrirCarruselGlobal = function(indexGlobal) {
             const item = reportesFiltradosGlobales[indexGlobal];
             carruselFotosActuales = [];
@@ -462,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function filtrarTablaDashboard() {
             const query = document.getElementById('inputBuscarTabla').value.toUpperCase().trim();
             reportesFiltradosGlobales = !query ? [...todosLosReportesGlobales] : todosLosReportesGlobales.filter(item => {
-                return `${item.dependencia} ${item.programa} ${item.descripcion} ${item.localidad} ${item.estatusAuditoria} ${item.comentariosAuditoria}`.toUpperCase().includes(query);
+                return `${item.dependencia} ${item.programa} ${item.descripcion} ${item.localidad} ${item.estatusAuditoria} ${item.comentariosAuditoria} ${item.periodoReporte} ${item.anioFiscal}`.toUpperCase().includes(query);
             });
             paginaActual = 1;
             renderizarTablaPaginada();
