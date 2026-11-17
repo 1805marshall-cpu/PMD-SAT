@@ -3,89 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso al Sistema PMD 2026-2029 - San Andrés Tuxtla</title>
+    <title>Dashboard Global y Auditoría PMD 2026-2029 - San Andrés Tuxtla</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="css/main.css">
+
+    <!-- Firebase SDKs versión Compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-slate-100 antialiased font-sans flex items-center justify-center min-h-screen p-4 relative overflow-hidden">
+<body class="bg-slate-50 antialiased font-sans text-slate-800 relative min-h-screen">
 
     <!-- Contenedor de Notificaciones Estilizadas (Toasts) -->
     <div id="toastContainer" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
-    <div class="max-w-md w-full bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden space-y-6 p-8 relative z-10">
-        
-        <!-- Identidad Institucional -->
-        <div class="text-center space-y-2">
-            <img src="img/2.png" alt="San Andrés Tuxtla 2026-2029" class="h-16 mx-auto object-contain">
-            <h1 class="text-lg font-bold text-slate-900 leading-tight">Sistema de Seguimiento PMD</h1>
-            <p class="text-xs text-slate-500">H. Ayuntamiento de San Andrés Tuxtla</p>
-
-        </div>
-
-        <!-- Formulario de Inicio de Sesión por Usuario y Contraseña -->
-        <form id="formLogin" onsubmit="procesarAcceso(event)" class="space-y-4">
+    <!-- ============================================================== -->
+    <!-- 1. MODAL DE LOGIN FLOTANTE SUPERIOR (TARJETA DE ACCESO)        -->
+    <!-- ============================================================== -->
+    <div id="loginOverlay" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-center justify-center p-4 transition-all duration-700 ease-in-out">
+        <div class="max-w-md w-full bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden space-y-6 p-8 relative transform transition-all duration-700 scale-100" id="loginCard">
             
-            <div>
-                <label class="block text-xs font-semibold text-slate-700 mb-1">Usuario Institucional</label>
-                <input type="text" id="inputUsuario" placeholder="Ej. dif, obras, admin..." required 
-                       class="w-full text-xs border border-slate-300 rounded-md p-3 text-slate-900 focus:ring-1 focus:ring-[#7A1C30] focus:border-[#7A1C30] outline-none transition">
+            <!-- Identidad Institucional -->
+            <div class="text-center space-y-2">
+                <img src="img/2.png" alt="San Andrés Tuxtla 2026-2029" class="h-16 mx-auto object-contain">
+                <h1 class="text-lg font-bold text-slate-900 leading-tight">Sistema de Seguimiento PMD</h1>
+                <p class="text-xs text-slate-500">H. Ayuntamiento de San Andrés Tuxtla</p>
             </div>
 
-            <div>
-                <label class="block text-xs font-semibold text-slate-700 mb-1">Contraseña de Acceso</label>
-                <input type="password" id="inputPassword" placeholder="••••••••" required 
-                       class="w-full text-xs border border-slate-300 rounded-md p-3 text-slate-900 focus:ring-1 focus:ring-[#7A1C30] focus:border-[#7A1C30] outline-none transition">
+            <!-- Formulario de Inicio de Sesión -->
+            <form id="formLogin" onsubmit="procesarAccesoUnificado(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Usuario Institucional</label>
+                    <input type="text" id="inputUsuario" placeholder="Ej. dif, obras, admin..." required 
+                           class="w-full text-xs border border-slate-300 rounded-md p-3 text-slate-900 focus:ring-1 focus:ring-[#7A1C30] focus:border-[#7A1C30] outline-none transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Contraseña de Acceso</label>
+                    <input type="password" id="inputPassword" placeholder="••••••••" required 
+                           class="w-full text-xs border border-slate-300 rounded-md p-3 text-slate-900 focus:ring-1 focus:ring-[#7A1C30] focus:border-[#7A1C30] outline-none transition">
+                </div>
+
+                <!-- Aviso de Acceso -->
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-md">
+                    <p class="text-[11px] text-amber-800 leading-relaxed">
+                        <strong>Acceso Controlado:</strong> Inicie sesión con sus credenciales institucionales para desbloquear el panel de control y auditoría.
+                    </p>
+                </div>
+
+                <!-- Botón de Ingreso -->
+                <button type="submit" id="btnIngresar" 
+                        class="w-full py-3 text-xs font-bold text-white bg-[#7A1C30] hover:bg-[#521220] rounded-md transition shadow-sm flex items-center justify-center space-x-2">
+                    <span>Iniciar Sesión</span>
+                </button>
+            </form>
+
+            <div class="text-center border-t border-slate-100 pt-4">
+                <p class="text-[11px] text-slate-400">Si olvidó sus credenciales de acceso, contacte a la Coordinación de Soporte Técnico.</p>
             </div>
-
-            <!-- Aviso de Acceso -->
-            <div class="bg-amber-50 border border-amber-200 p-3 rounded-md">
-                <p class="text-[11px] text-amber-800 leading-relaxed">
-                    <strong>Acceso Controlado:</strong> El sistema validará su usuario y le redirigirá automáticamente a su módulo correspondiente.
-                </p>
-            </div>
-
-            <!-- Botón de Ingreso -->
-            <button type="submit" id="btnIngresar" 
-                    class="w-full py-3 text-xs font-bold text-white bg-[#7A1C30] hover:bg-[#521220] rounded-md transition shadow-sm flex items-center justify-center space-x-2">
-                <span>Iniciar Sesión</span>
-            </button>
-        </form>
-
-        <div class="text-center border-t border-slate-100 pt-4">
-            <p class="text-[11px] text-slate-400">Si olvidó sus credenciales de acceso, contacte a la Coordinación de Soporte Técnico.</p>
         </div>
     </div>
 
-    <!-- Script de la aplicación y lógica de notificaciones estilizadas -->
+
+    <!-- ============================================================== -->
+    <!-- 2. DASHBOARD GLOBAL DE FONDO (OCULTO HASTA INICIAR SESIÓN)     -->
+    <!-- ============================================================== -->
+    <div id="dashboardContainer" class="opacity-0 pointer-events-none transition-all duration-700 ease-in-out space-y-8 pb-12">
+        
+        <!-- Header / Navbar Institucional Superior -->
+        <header class="bg-[#7A1C30] text-white border-b border-[#521220] sticky top-0 z-40 shadow-md">
+            <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <img src="img/2.png" alt="San Andrés Tuxtla 2026-2029" class="h-10 object-contain">
+                    <div class="border-l border-white/20 pl-4">
+                        <h1 class="font-bold text-sm leading-tight text-white flex items-center gap-2">
+                            H. Ayuntamiento de San Andrés Tuxtla 
+                        </h1>
+                        <p class="text-[11px] text-amber-100 flex items-center gap-2 mt-0.5">
+                            <span>Sistema de Auditoría y Seguimiento PMD 2026-2029</span>
+                            <img src="img/3.png" alt="¡Capaz de Resolver!" class="h-4 object-contain inline-block">
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6 text-xs border-l border-white/20 pl-6">
+                    <div class="h-8 w-px bg-white/20"></div>
+                    <div class="flex items-center space-x-3">
+                        <a href="reportes.html" class="bg-white text-[#7A1C30] hover:bg-slate-100 px-3 py-1.5 rounded font-bold text-xs transition shadow-sm flex items-center gap-1.5">
+                            📄 Generar Informe COPLADEMUN
+                        </a>
+                        <button type="button" onclick="window.cerrarSesionUnificada()" class="text-xs text-white bg-[#521220] hover:bg-red-900 border border-white/20 font-bold px-3 py-1.5 rounded transition shadow-sm">
+                            Cerrar Sesión 
+                        </button>
+                    </div>
+                    <div>
+                        <span class="block text-slate-200">Panel de Control de Auditoría</span>
+                        <span id="labelUsuarioConectado" class="font-semibold text-amber-100">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-7xl mx-auto px-6 space-y-8">
+
+            <!-- Banner Principal de Avance Municipal y Cuatrienal -->
+            <div class="gob-card p-6 bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden rounded-xl">
+                <div class="absolute right-4 -bottom-6 opacity-5 pointer-events-none">
+                    <img src="img/1.png" alt="Escudo" class="h-48 object-contain">
+                </div>
+
+                <div class="space-y-1 z-10">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Evaluación y Calificación Institucional (Contraloría / Admin)</span>
+                    <h2 class="text-2xl font-bold text-slate-900">Panel de Control y Ponderación Cuatrienal (PMD)</h2>
+                    <p class="text-xs text-slate-500">Supervisión detallada de los 4 años de administración (cada año representa el 25% de la meta global del cuatrienio).</p>
+                </div>
+                <div class="flex items-center space-x-6 border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-6 w-full md:w-auto justify-around z-10">
+                    <div class="text-center">
+                        <span class="block text-xs font-medium text-slate-500">Avance Global Cuatrienio</span>
+                        <span id="globalPorcentaje" class="text-3xl font-extrabold text-[#7A1C30]">0.0%</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="block text-xs font-medium text-slate-500">Estatus Institucional</span>
+                        <span id="globalEstatus" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 mt-1">
+                            ⏳ Analizando...
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 📊 FILTROS DE PERIODICIDAD CONFORME AL MANUAL (ANUAL, TRIMESTRAL, SEMESTRAL, MENSUAL) -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-2 text-xs font-bold text-slate-700">
+                    <i class="bi bi-filter-circle-fill text-[#7A1C30] text-base"></i>
+                    <span>Filtros de Evaluación Institucional (Manual de Contraloría):</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <select id="filtroAnioSelect" onchange="aplicarFiltrosAvanzados()" class="text-xs border border-slate-300 rounded-md p-2 bg-slate-50 font-medium text-slate-800 focus:ring-1 focus:ring-[#7A1C30]">
+                        <option value="TODOS">📅 Todos los Años (Cuatrienio 2026-2029)</option>
+                        <option value="2026">1er Año (2026)</option>
+                        <option value="2027">2do Año (2027)</option>
+                        <option value="2028">3er Año (2028)</option>
+                        <option value="2029">4to Año (2029)</option>
+                    </select>
+
+                    <select id="filtroPeriodoSelect" onchange="aplicarFiltrosAvanzados()" class="text-xs border border-slate-300 rounded-md p-2 bg-slate-50 font-medium text-slate-800 focus:ring-1 focus:ring-[#7A1C30]">
+                        <option value="TODOS">⏳ Todos los Periodos (Mensual/Anual)</option>
+                        <option value="TRIMESTRE_1">📊 1er Trimestre (Ene - Mar)</option>
+                        <option value="TRIMESTRE_2">📊 2do Trimestre (Abr - Jun)</option>
+                        <option value="TRIMESTRE_3">📊 3er Trimestre (Jul - Sep)</option>
+                        <option value="TRIMESTRE_4">📊 4to Trimestre (Oct - Dic)</option>
+                        <option value="SEMESTRE_1">📈 1er Semestre (Ene - Jun)</option>
+                        <option value="SEMESTRE_2">📈 2do Semestre (Jul - Dic)</option>
+                        <option value="ANUAL">🏆 Consolidado Anual (12 Meses)</option>
+                    </select>
+
+                    <button type="button" onclick="reiniciarFiltrosDashboard()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded transition">
+                        🔄 Limpiar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE DESGLOSE ANUAL (2026 - 2029) CADA UNO APORTA HASTA 25% -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-[#7A1C30] space-y-2">
+                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-400 uppercase">1er Año (2026)</span><span class="px-2 py-0.5 bg-amber-50 text-amber-800 text-[10px] font-bold rounded border border-amber-200">Máx: 25%</span></div>
+                    <div><h4 id="valorAnio2026" class="text-xl font-extrabold text-slate-900">0.0%</h4><p id="detalleAnio2026" class="text-[11px] text-slate-500">0 cortes</p></div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden"><div id="barraAnio2026" class="bg-[#7A1C30] h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-slate-300 space-y-2">
+                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-400 uppercase">2do Año (2027)</span><span class="px-2 py-0.5 bg-amber-50 text-amber-800 text-[10px] font-bold rounded border border-amber-200">Máx: 25%</span></div>
+                    <div><h4 id="valorAnio2027" class="text-xl font-extrabold text-slate-900">0.0%</h4><p id="detalleAnio2027" class="text-[11px] text-slate-500">0 cortes</p></div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden"><div id="barraAnio2027" class="bg-amber-600 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-slate-300 space-y-2">
+                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-400 uppercase">3er Año (2028)</span><span class="px-2 py-0.5 bg-amber-50 text-amber-800 text-[10px] font-bold rounded border border-amber-200">Máx: 25%</span></div>
+                    <div><h4 id="valorAnio2028" class="text-xl font-extrabold text-slate-900">0.0%</h4><p id="detalleAnio2028" class="text-[11px] text-slate-500">0 cortes</p></div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden"><div id="barraAnio2028" class="bg-amber-600 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-slate-300 space-y-2">
+                    <div class="flex justify-between items-center"><span class="text-[10px] font-bold text-slate-400 uppercase">4to Año (2029)</span><span class="px-2 py-0.5 bg-amber-50 text-amber-800 text-[10px] font-bold rounded border border-amber-200">Máx: 25%</span></div>
+                    <div><h4 id="valorAnio2029" class="text-xl font-extrabold text-slate-900">0.0%</h4><p id="detalleAnio2029" class="text-[11px] text-slate-500">0 cortes</p></div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden"><div id="barraAnio2029" class="bg-emerald-600 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+                </div>
+            </div>
+
+            <!-- Rejilla de Ejes Organizados -->
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Ejes Estratégicos y Dependencias Responsables (PMD 2026-2029)</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="gob-card p-5 space-y-4 bg-white border border-slate-200 rounded-xl flex flex-col justify-between">
+                        <div class="space-y-3"><div class="flex justify-between"><span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600">Eje 1</span><span id="badgeEje1" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border">0.0%</span></div><h4 class="font-bold text-sm text-slate-900">Gobernar con Capacidad</h4></div>
+                        <a href="departamentos/eje1.html" class="text-xs font-bold text-white bg-[#7A1C30] px-3 py-1.5 rounded text-center transition">Ver Módulo →</a>
+                    </div>
+                    <div class="gob-card p-5 space-y-4 bg-white border border-slate-200 rounded-xl flex flex-col justify-between">
+                        <div class="space-y-3"><div class="flex justify-between"><span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600">Eje 2</span><span id="badgeEje2" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border">0.0%</span></div><h4 class="font-bold text-sm text-slate-900">Desarrollo Económico que Genera</h4></div>
+                        <a href="departamentos/eje2.html" class="text-xs font-bold text-white bg-[#7A1C30] px-3 py-1.5 rounded text-center transition">Ver Módulo →</a>
+                    </div>
+                    <div class="gob-card p-5 space-y-4 bg-white border border-slate-200 rounded-xl flex flex-col justify-between">
+                        <div class="space-y-3"><div class="flex justify-between"><span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600">Eje 3</span><span id="badgeEje3" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border">0.0%</span></div><h4 class="font-bold text-sm text-slate-900">Bienestar que se Construye</h4></div>
+                        <a href="departamentos/eje3.html" class="text-xs font-bold text-white bg-[#7A1C30] px-3 py-1.5 rounded text-center transition">Ver Módulo →</a>
+                    </div>
+                    <div class="gob-card p-5 space-y-4 bg-white border border-slate-200 rounded-xl flex flex-col justify-between">
+                        <div class="space-y-3"><div class="flex justify-between"><span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600">Eje 4</span><span id="badgeEje4" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border">0.0%</span></div><h4 class="font-bold text-sm text-slate-900">Servicios Públicos con Resultados</h4></div>
+                        <a href="departamentos/eje4.html" class="text-xs font-bold text-white bg-[#7A1C30] px-3 py-1.5 rounded text-center transition">Ver Módulo →</a>
+                    </div>
+                    <div class="gob-card p-5 space-y-4 bg-white border border-slate-200 rounded-xl flex flex-col justify-between">
+                        <div class="space-y-3"><div class="flex justify-between"><span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-50 text-amber-700">Transversal</span><span id="badgeEje5" class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded border">0.0%</span></div><h4 class="font-bold text-sm text-slate-900">Igualdad Sustantiva e Inclusión</h4></div>
+                        <a href="departamentos/transversal.html" class="text-xs font-bold text-white bg-[#7A1C30] px-3 py-1.5 rounded text-center transition">Ver Módulo →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Auditoría con Evidencias -->
+            <div class="gob-card overflow-hidden bg-white border border-slate-200 rounded-xl">
+                <div class="p-4 bg-slate-100 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Matriz de Auditoría, Liberación y Ponderación (EDM-SAT)</h3>
+                    <input type="text" id="inputBuscarTabla" onkeyup="filtrarTablaDashboard()" placeholder="🔍 Buscar..." class="text-xs border border-slate-300 rounded-md px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#7A1C30]">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-slate-50 uppercase text-slate-400 border-b border-slate-200 font-semibold">
+                            <tr>
+                                <th class="p-3">Eje Institucional</th>
+                                <th class="p-3">Acción / Indicador Reportado</th>
+                                <th class="p-3 text-center">Calificación (IE) %</th>
+                                <th class="p-3 text-center">Evidencias</th>
+                                <th class="p-3">Estatus y Liberación</th>
+                                <th class="p-3">Comentarios de Corrección</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyDashboard" class="divide-y divide-slate-100">
+                            <tr><td colspan="6" class="p-6 text-center text-slate-400 italic">Cargando bitácora general de Firebase...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación -->
+                <div id="paginacionContainer" class="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center text-xs">
+                    <span id="infoPaginacion" class="text-slate-500 font-medium">Mostrando 0 de 0 registros</span>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" id="btnAnterior" onclick="cambiarPagina(-1)" class="px-3 py-1 bg-white border border-slate-300 rounded text-slate-600 font-semibold hover:bg-slate-100 disabled:opacity-40">← Anterior</button>
+                        <span id="textoPaginaActual" class="px-3 py-1 bg-white border border-slate-200 rounded font-bold text-[#7A1C30]">Página 1 de 1</span>
+                        <button type="button" id="btnSiguiente" onclick="cambiarPagina(1)" class="px-3 py-1 bg-white border border-slate-300 rounded text-slate-600 font-semibold hover:bg-slate-100 disabled:opacity-40">Siguiente →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CARRUSEL INTERACTIVO DE FOTOGRAFÍAS Y VISOR DE PDFs -->
+    <div id="modalCarrusel" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="relative max-w-4xl w-full bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 p-6 flex flex-col items-center space-y-4">
+            <div class="w-full flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 id="carruselTitulo" class="text-sm font-bold text-white">Evidencias del Expediente</h3>
+                <button type="button" onclick="window.cerrarCarrusel()" class="text-slate-400 hover:text-white font-bold text-xl px-2 py-1">✕</button>
+            </div>
+            <div id="carruselContenidoDinamico" class="relative w-full h-[60vh] flex flex-col items-center justify-center bg-black/50 rounded-xl overflow-y-auto p-4 border border-slate-800 text-white text-xs space-y-4"></div>
+        </div>
+    </div>
+
+    <!-- Script General -->
     <script src="js/app.js"></script>
     <script>
+        let todosLosReportesGlobales = [];
+        let reportesFiltradosGlobales = [];
+        let paginaActual = 1;
+        const registrosPorPagina = 10;
+
         function mostrarNotificacion(mensaje, tipo = 'exito') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            
-            const bgColor = tipo === 'exito' ? 'bg-emerald-900/95 border-emerald-700 text-white' : 'bg-rose-900/95 border-rose-700 text-white';
-            const icono = tipo === 'exito' ? '✨' : '⚠️';
-
-            toast.className = `pointer-events-auto flex items-center space-x-3 px-4 py-3 rounded-lg shadow-xl border backdrop-blur-md text-xs font-semibold transition-all duration-300 transform translate-y-2 opacity-0 ${bgColor}`;
-            toast.innerHTML = `<span>${icono}</span> <span>${mensaje}</span>`;
-            
+            const bgColor = tipo === 'exito' ? 'bg-emerald-900/95 text-white' : 'bg-rose-900/95 text-white';
+            toast.className = `pointer-events-auto px-4 py-3 rounded-lg shadow-xl text-xs font-semibold transition-all ${bgColor}`;
+            toast.innerHTML = `<span>${mensaje}</span>`;
             container.appendChild(toast);
-
-            // Animación de entrada
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            // Desvanecimiento automático
-            setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 2500);
+            setTimeout(() => toast.remove(), 2500);
         }
 
-        function procesarAcceso(e) {
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar si ya existe una sesión guardada previamente
+            const sesionActiva = localStorage.getItem("sesion_pmd_sat");
+            const tipoUsuario = localStorage.getItem("tipoUsuario");
+
+            if (sesionActiva && tipoUsuario === 'admin') {
+                try {
+                    const sesion = JSON.parse(sesionActiva);
+                    desvanecerLoginYMostrarDashboard(sesion.nombreDep || "Administrador General");
+                } catch(e) {}
+            }
+        });
+
+        function procesarAccesoUnificado(e) {
             e.preventDefault();
             const usuario = document.getElementById('inputUsuario').value.trim().toLowerCase();
             const password = document.getElementById('inputPassword').value;
@@ -94,15 +306,12 @@
             btn.disabled = true;
             btn.innerHTML = `<svg class="animate-spin h-4 w-4 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>`;
 
-            // Simular breve pausa visual de carga y validar credenciales
             setTimeout(() => {
                 const resultado = iniciarSesionUsuario(usuario, password);
 
                 if (resultado.exito) {
-                    mostrarNotificacion(`¡Bienvenido al sistema, ${resultado.dep}! Redirigindo...`, 'exito');
-                    setTimeout(() => {
-                        window.location.href = resultado.ruta;
-                    }, 1000);
+                    mostrarNotificacion(`¡Bienvenido al sistema, ${resultado.dep}!`, 'exito');
+                    desvanecerLoginYMostrarDashboard(resultado.dep);
                 } else {
                     mostrarNotificacion("Error: Usuario o contraseña incorrectos.", 'error');
                     btn.disabled = false;
@@ -110,6 +319,291 @@
                 }
             }, 600);
         }
+
+        function desvanecerLoginYMostrarDashboard(nombreDep) {
+            const overlay = document.getElementById('loginOverlay');
+            const card = document.getElementById('loginCard');
+            const dashboard = document.getElementById('dashboardContainer');
+
+            // Animación de desvanecimiento de la tarjeta y el fondo oscuro
+            card.classList.add('scale-95', 'opacity-0');
+            overlay.classList.add('opacity-0');
+
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                dashboard.classList.remove('opacity-0', 'pointer-events-none');
+                
+                const labelUser = document.getElementById('labelUsuarioConectado');
+                if (labelUser) labelUser.innerText = nombreDep;
+
+                if (typeof verificarSesionActiva === 'function') verificarSesionActiva(true);
+                if (typeof obtenerReportesBD === 'function') cargarBitacoraGlobal();
+            }, 600);
+        }
+
+        window.cerrarSesionUnificada = function() {
+            if (typeof cerrarSesionBD === 'function') {
+                cerrarSesionBD();
+            } else {
+                localStorage.removeItem("sesion_pmd_sat");
+                localStorage.removeItem("tipoUsuario");
+            }
+            window.location.reload();
+        }
+
+        async function cargarBitacoraGlobal() {
+            if (typeof obtenerReportesBD !== 'function') return;
+            todosLosReportesGlobales = await obtenerReportesBD();
+            reportesFiltradosGlobales = [...todosLosReportesGlobales];
+            actualizarEstadisticasReales(todosLosReportesGlobales);
+            paginaActual = 1;
+            renderizarTablaPaginada();
+        }
+
+        function aplicarFiltrosAvanzados() {
+            const anioFiltro = document.getElementById('filtroAnioSelect').value;
+            const periodoFiltro = document.getElementById('filtroPeriodoSelect').value;
+            const queryBusqueda = document.getElementById('inputBuscarTabla').value.toUpperCase().trim();
+
+            reportesFiltradosGlobales = todosLosReportesGlobales.filter(item => {
+                const coincideAnio = (anioFiltro === 'TODOS') || (item.anioFiscal === anioFiltro);
+                let coincidePeriodo = true;
+                const periodoReporteStr = (item.periodoReporte || "").toUpperCase();
+                const mesesArr = item.mesesArray || [];
+
+                if (periodoFiltro === 'TRIMESTRE_1') {
+                    coincidePeriodo = mesesArr.some(m => ['ENERO', 'FEBRERO', 'MARZO'].includes(m.toUpperCase())) || periodoReporteStr.includes('ENERO');
+                } else if (periodoFiltro === 'TRIMESTRE_2') {
+                    coincidePeriodo = mesesArr.some(m => ['ABRIL', 'MAYO', 'JUNIO'].includes(m.toUpperCase()));
+                } else if (periodoFiltro === 'TRIMESTRE_3') {
+                    coincidePeriodo = mesesArr.some(m => ['JULIO', 'AGOSTO', 'SEPTIEMBRE'].includes(m.toUpperCase()));
+                } else if (periodoFiltro === 'TRIMESTRE_4') {
+                    coincidePeriodo = mesesArr.some(m => ['OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'].includes(m.toUpperCase()));
+                } else if (periodoFiltro === 'ANUAL') {
+                    coincidePeriodo = mesesArr.length >= 10 || periodoReporteStr.includes('ANUAL');
+                }
+
+                const coincideTexto = !queryBusqueda || `${item.dependencia} ${item.programa} ${item.estrategia} ${item.descripcion} ${item.estatusAuditoria}`.toUpperCase().includes(queryBusqueda);
+
+                return coincideAnio && coincidePeriodo && coincideTexto;
+            });
+
+            paginaActual = 1;
+            renderizarTablaPaginada();
+        }
+
+        function reiniciarFiltrosDashboard() {
+            document.getElementById('filtroAnioSelect').value = 'TODOS';
+            document.getElementById('filtroPeriodoSelect').value = 'TODOS';
+            document.getElementById('inputBuscarTabla').value = '';
+            reportesFiltradosGlobales = [...todosLosReportesGlobales];
+            paginaActual = 1;
+            renderizarTablaPaginada();
+        }
+
+        function actualizarEstadisticasReales(reportes) {
+            if (!reportes || reportes.length === 0) return;
+            function limpiarPorcentaje(str) {
+                if (!str) return 0;
+                let num = parseFloat(String(str).replace('%', '').trim());
+                return isNaN(num) ? 0 : num;
+            }
+
+            const ejeMap = {
+                "Eje 1: Gobernar con Capacidad": "badgeEje1",
+                "Eje 2: Desarrollo Económico que Genera": "badgeEje2",
+                "Eje 3: Bienestar que se Construye": "badgeEje3",
+                "Eje 4: Servicios Públicos e Infraestructura": "badgeEje4",
+                "Eje 5: Igualdad Sustantiva e Inclusión Social": "badgeEje5"
+            };
+
+            for (const [ejeName, elementId] of Object.entries(ejeMap)) {
+                let repEje = reportes.filter(r => r.dependencia === ejeName || r.eje === ejeName);
+                let badgeEl = document.getElementById(elementId);
+                if (badgeEl && repEje.length > 0) {
+                    let sumaEje = repEje.reduce((acc, r) => acc + limpiarPorcentaje(r.porcentajeIE), 0);
+                    badgeEl.innerText = (sumaEje / repEje.length).toFixed(1) + '%';
+                }
+            }
+
+            let aniosData = { "2026": { suma: 0, cuenta: 0 }, "2027": { suma: 0, cuenta: 0 }, "2028": { suma: 0, cuenta: 0 }, "2029": { suma: 0, cuenta: 0 } };
+
+            reportes.forEach(r => {
+                const anio = r.anioFiscal || "2026";
+                const val = limpiarPorcentaje(r.porcentajeIE);
+                if (aniosData[anio]) { aniosData[anio].suma += val; aniosData[anio].cuenta += 1; }
+            });
+
+            let acumuladoCuatrienioGlobal = 0;
+            ["2026", "2027", "2028", "2029"].forEach(anio => {
+                const data = aniosData[anio];
+                const promedioAnual = data.cuenta > 0 ? (data.suma / data.cuenta) : 0;
+                const aporteAnualAlCuatrienio = promedioAnual * 0.25;
+                acumuladoCuatrienioGlobal += aporteAnualAlCuatrienio;
+
+                document.getElementById(`valorAnio${anio}`).innerText = promedioAnual.toFixed(1) + "%";
+                document.getElementById(`detalleAnio${anio}`).innerText = `${data.cuenta} corte(s) (Aporte: ${aporteAnualAlCuatrienio.toFixed(1)}%)`;
+                document.getElementById(`barraAnio${anio}`).style.width = `${promedioAnual}%`;
+            });
+
+            document.getElementById('globalPorcentaje').innerText = acumuladoCuatrienioGlobal.toFixed(1) + '%';
+
+            const badgeGlobalEst = document.getElementById('globalEstatus');
+            if (badgeGlobalEst) {
+                if (acumuladoCuatrienioGlobal >= 90) {
+                    badgeGlobalEst.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 mt-1";
+                    badgeGlobalEst.innerText = "🟢 Óptimo / En Meta";
+                } else if (acumuladoCuatrienioGlobal >= 50) {
+                    badgeGlobalEst.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 mt-1";
+                    badgeGlobalEst.innerText = "🟡 Avance Regular";
+                } else {
+                    badgeGlobalEst.className = "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 mt-1";
+                    badgeGlobalEst.innerText = "🔴 Requiere Atención";
+                }
+            }
+        }
+
+        function renderizarTablaPaginada() {
+            const tbody = document.getElementById('tbodyDashboard');
+            if (!tbody) return;
+
+            if (reportesFiltradosGlobales.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">📂 No hay registros de avance capturados.</td></tr>`;
+                document.getElementById('infoPaginacion').innerText = `Mostrando 0 de 0 registros`;
+                document.getElementById('textoPaginaActual').innerText = `Página 1 de 1`;
+                return;
+            }
+
+            const totalRegistros = reportesFiltradosGlobales.length;
+            const totalPaginas = Math.ceil(totalRegistros / registrosPorPagina);
+            if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+            if (paginaActual < 1) paginaActual = 1;
+
+            const inicio = (paginaActual - 1) * registrosPorPagina;
+            const fin = inicio + registrosPorPagina;
+            const reportesPagina = reportesFiltradosGlobales.slice(inicio, fin);
+
+            tbody.innerHTML = "";
+            reportesPagina.forEach((item, indexReal) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100 align-top";
+
+                let evidenciasHtml = '<div class="flex flex-col gap-1 items-center">';
+                const mapLineas = item.evidenciasPorLineaMap || item.evidenciasPorLinea || {};
+                let tieneAlMenosUnaEvidencia = false;
+
+                if (Object.keys(mapLineas).length > 0) {
+                    Object.keys(mapLineas).forEach(lKey => {
+                        const lData = mapLineas[lKey];
+                        const imgs = lData.imagenes || lData.fotos || [];
+                        if (lData.pdf || imgs.length > 0) tieneAlMenosUnaEvidencia = true;
+                    });
+                } else if (item.documentoPdfBase64 || item.fotosEvidencia?.length > 0) {
+                    tieneAlMenosUnaEvidencia = true;
+                }
+
+                if (tieneAlMenosUnaEvidencia) {
+                    evidenciasHtml += `<button type="button" onclick="window.abrirVisorEvidenciasGlobal(${inicio + indexReal})" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded text-[11px] font-bold inline-flex items-center gap-1.5 transition shadow-sm"><i class="bi bi-folder2-open"></i> <span>Ver Evidencias</span></button>`;
+                } else {
+                    evidenciasHtml += `<span class="text-slate-400 italic text-[11px]">Sin evidencias</span>`;
+                }
+                evidenciasHtml += '</div>';
+
+                let porcentajeLimpio = String(item.porcentajeIE || "0.0%").replace('%','').trim();
+                let inputCalificacionHtml = `
+                    <div class="flex items-center justify-center space-x-1">
+                        <input type="text" id="inputPorc_${item.id}" value="${porcentajeLimpio}" class="w-16 text-center text-xs font-extrabold text-[#7A1C30] border border-slate-300 rounded p-1 bg-amber-50 focus:bg-white focus:ring-1 focus:ring-[#7A1C30]">
+                        <span class="text-xs font-bold text-slate-500">%</span>
+                        <button type="button" onclick="window.guardarCalificacionDirecta('${item.id}')" class="px-2 py-1 bg-[#7A1C30] text-white rounded text-[10px] font-bold">💾</button>
+                    </div>
+                `;
+
+                const estatusActual = item.estatusAuditoria || "Pendiente de Validación";
+                const selectEstatusHtml = `
+                    <select id="selectEstatus_${item.id}" onchange="window.cambiarEstatusReporte('${item.id}', this.value)" class="text-[11px] font-bold border rounded px-2 py-1.5 bg-white">
+                        <option value="Pendiente de Validación" ${estatusActual === 'Pendiente de Validación' ? 'selected' : ''}>⏳ Pendiente</option>
+                        <option value="Aprobado y Liberado" ${estatusActual === 'Aprobado y Liberado' ? 'selected' : ''}>✅ Aprobado y Liberado</option>
+                        <option value="Devuelto a Corrección" ${estatusActual === 'Devuelto a Corrección' ? 'selected' : ''}>⚠️ Devuelto a Corrección</option>
+                    </select>
+                `;
+
+                const observacionActual = item.comentariosAuditoria || "";
+                const inputObsHtml = `
+                    <div class="space-y-1">
+                        <textarea id="textareaObs_${item.id}" rows="2" placeholder="Motivos..." class="text-[11px] border border-slate-200 rounded px-2 py-1 w-full bg-slate-50 resize-none">${observacionActual}</textarea>
+                        <button type="button" onclick="window.guardarObservacionReporte('${item.id}')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-900 text-white rounded text-[10px]">Enviar</button>
+                    </div>
+                `;
+
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-800">${item.dependencia || 'General'}<br><span class="inline-block bg-amber-100 text-amber-900 px-2 py-0.5 rounded text-[10px] font-bold mt-1">📅 ${item.periodoReporte || 'Corte'} (${item.anioFiscal || '2026'})</span></td>
+                    <td class="p-3"><p class="font-bold text-slate-900">${item.programa || item.estrategia || 'Estrategia'}</p><p class="text-[11px] text-slate-500 italic">"${item.descripcion || ''}"</p></td>
+                    <td class="p-3 text-center">${inputCalificacionHtml}</td>
+                    <td class="p-3 text-center">${evidenciasHtml}</td>
+                    <td class="p-3">${selectEstatusHtml}</td>
+                    <td class="p-3">${inputObsHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('infoPaginacion').innerText = `Mostrando del ${inicio + 1} al ${Math.min(fin, totalRegistros)} de ${totalRegistros} registros`;
+            document.getElementById('textoPaginaActual').innerText = `Página ${paginaActual} de ${totalPaginas}`;
+            document.getElementById('btnAnterior').disabled = paginaActual === 1;
+            document.getElementById('btnSiguiente').disabled = paginaActual === totalPaginas;
+        }
+
+        window.abrirVisorEvidenciasGlobal = function(indexGlobal) {
+            const item = reportesFiltradosGlobales[indexGlobal];
+            const contenedor = document.getElementById('carruselContenidoDinamico');
+            contenedor.innerHTML = "";
+
+            document.getElementById('carruselTitulo').innerText = `Expediente: ${item.programa || item.estrategia}`;
+            
+            const mapLineas = item.evidenciasPorLineaMap || item.evidenciasPorLinea || {};
+            let html = `<div class="space-y-3 w-full text-xs">`;
+            if (Object.keys(mapLineas).length > 0) {
+                Object.keys(mapLineas).forEach((lKey, idx) => {
+                    const lData = mapLineas[lKey];
+                    if (lData.pdf) {
+                        html += `<div class="bg-slate-800 p-2 rounded flex justify-between items-center"><span>📄 PDF Línea ${idx+1}: ${lData.pdf.nombre}</span><a href="${lData.pdf.base64}" download="${lData.pdf.nombre}" class="px-2 py-1 bg-[#7A1C30] text-white rounded font-bold">Descargar</a></div>`;
+                    }
+                });
+            }
+            html += `</div>`;
+            contenedor.innerHTML = html;
+            document.getElementById('modalCarrusel').classList.remove('hidden');
+        };
+
+        window.cerrarCarrusel = () => document.getElementById('modalCarrusel').classList.add('hidden');
+        function cambiarPagina(dir) { paginaActual += dir; renderizarTablaPaginada(); }
+        function filtrarTablaDashboard() { aplicarFiltrosAvanzados(); }
+
+        window.guardarCalificacionDirecta = async function(id) {
+            const inputVal = document.getElementById(`inputPorc_${id}`).value.trim();
+            const num = parseFloat(inputVal);
+            if (isNaN(num)) { mostrarNotificacion("⚠️ Ingrese un valor numérico válido.", "error"); return; }
+            const nuevoStr = num.toFixed(1) + "%";
+            const res = await actualizarReporteBD(id, { porcentajeIE: nuevoStr });
+            if (res && res.exito) {
+                const item = todosLosReportesGlobales.find(r => r.id === id);
+                if (item) item.porcentajeIE = nuevoStr;
+                actualizarEstadisticasReales(todosLosReportesGlobales);
+                mostrarNotificacion(`✅ Calificación actualizada a ${nuevoStr}.`, "exito");
+            } else { mostrarNotificacion("Error al actualizar.", "error"); }
+        };
+
+        window.cambiarEstatusReporte = async function(id, estatus) {
+            const res = await actualizarReporteBD(id, { estatusAuditoria: estatus });
+            if (res && res.exito) { mostrarNotificacion(`Estatus actualizado a: "${estatus}"`, "exito"); }
+            else { mostrarNotificacion("Error al actualizar estatus.", "error"); }
+        };
+
+        window.guardarObservacionReporte = async function(id) {
+            const texto = document.getElementById(`textareaObs_${id}`).value.trim();
+            const res = await actualizarReporteBD(id, { comentariosAuditoria: texto });
+            if (res && res.exito) { mostrarNotificacion("💬 Observaciones enviadas.", "exito"); }
+            else { mostrarNotificacion("Error al guardar observaciones.", "error"); }
+        };
     </script>
 </body>
 </html>

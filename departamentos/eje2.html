@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eje 2: Desarrollo Económico - Sistema PMD 2026-2029</title>
+    <title>Eje 2: Desarrollo Económico que Genera - Sistema PMD 2026-2029</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
 </head>
 <body class="bg-slate-50 antialiased font-sans text-slate-800 relative">
 
-    <!-- Contenedor de Notificaciones Estilizadas (Toasts) -->
+    <!-- Contenedor de Notificaciones Toast Modernas -->
     <div id="toastContainer" class="fixed top-5 right-5 z-50 space-y-3 pointer-events-none"></div>
 
     <!-- Navbar Institucional -->
@@ -33,18 +33,17 @@
                     </p>
                 </div>
             </div>
-            <!-- Botones de Navegación y Sesión Segura -->
             <div class="flex items-center space-x-3">
-                <!-- Botón Dashboard (Visible solo para Admin) -->
+                <button type="button" onclick="window.abrirModalAyuda()" class="text-xs text-amber-200 bg-amber-950/60 hover:bg-amber-900 border border-amber-500/30 font-bold px-3 py-1.5 rounded transition shadow-sm flex items-center gap-1.5">
+                    <i class="bi bi-file-earmark-medical-fill text-amber-300"></i> Matriz y Parámetros del Manual (Contraloría)
+                </button>
                 <a href="../dashboard.html" id="linkDashboard" class="hidden text-xs text-[#7A1C30] bg-white hover:bg-slate-100 font-bold px-3 py-1.5 rounded transition shadow-sm">← Dashboard</a>
                 
-                <!-- Insignia del Usuario Conectado con Candado de Seguridad -->
                 <div class="inline-flex items-center space-x-2 text-xs text-white bg-[#521220]/70 border border-white/20 font-medium px-3 py-1.5 rounded shadow-sm">
                     <i class="bi bi-shield-lock-fill text-amber-300 text-sm"></i>
                     <span id="labelUsuarioNavbar" class="font-bold tracking-wide">Cargando...</span>
                 </div>
 
-                <!-- Botón Cerrar Sesión -->
                 <button type="button" onclick="window.cerrarSesionBD()" class="text-xs text-white bg-[#521220] hover:bg-red-900 border border-white/20 font-bold px-3 py-1.5 rounded transition shadow-sm">
                     Cerrar Sesión
                 </button>
@@ -54,205 +53,124 @@
 
     <div class="max-w-7xl mx-auto px-6 py-8 space-y-8">
         
-        <!-- Formulario de Captura Conforme a Matriz PMD -->
+        <!-- Formulario de Integración de Expediente -->
         <div class="gob-card p-6 bg-white border border-slate-200 shadow-sm space-y-6">
-            <div class="border-b border-slate-100 pb-4 flex justify-between items-center">
+            <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <div class="flex items-center space-x-2">
-                        <h2 id="tituloFormulario" class="text-base font-bold text-slate-900">Registro de Avance Físico y Proyecciones — Eje 2 (PMD 2026–2029)</h2>
-                        <!-- Botón de Interrogación con Matriz Oficial del Manual -->
-                        <button type="button" onclick="window.abrirModalAyudaPMD()" class="w-6 h-6 rounded-full bg-[#7A1C30]/10 text-[#7A1C30] hover:bg-[#7A1C30] hover:text-white font-bold text-xs flex items-center justify-center transition shadow-sm" title="Ver matriz oficial de alineación del manual PMD y Plan Veracruzano">
-                            ?
-                        </button>
-                    </div>
-                    <p class="text-xs text-slate-500">Impulso al sector rural, comercio local, ganadería, pesca y detonación turística.</p>
+                    <h2 id="tituloFormulario" class="text-base font-bold text-slate-900">Integración de Expediente — Eje 2: Desarrollo Económico que Genera (9 Estrategias Oficiales)</h2>
+                    <p class="text-xs text-slate-500">Seleccione el año de administración, la estrategia institucional, el periodo de evaluación y adjunte las evidencias.</p>
                 </div>
-                <span id="badgeEstatusForm" class="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded text-xs font-semibold">
-                    Estatus: En Captura
+                <span id="badgeEstatusForm" class="px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded text-xs font-bold">
+                    Estatus: Pendiente de Envío
                 </span>
             </div>
 
-            <form id="formDesarrolloEco" onsubmit="window.guardarOActualizarRegistro(event)" class="space-y-6">
+            <form id="formServicios" onsubmit="window.guardarOActualizarRegistro(event)" class="space-y-6">
                 
-                <!-- Campo oculto para almacenar el ID cuando se edita un registro existente -->
                 <input type="hidden" id="editReportId" value="">
 
-                <!-- 📅 SELECCIÓN DE AÑO FISCAL Y CHECKLIST DE MESES -->
+                <!-- 1. AÑO FISCAL (METAS DE LOS 4 AÑOS) -->
                 <div class="space-y-4 bg-slate-50/70 p-5 rounded-xl border border-slate-200">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">🏛️ Año Fiscal / Administración (PMD)</label>
-                            <select id="selectAnioFiscal" required class="w-full text-xs border border-slate-300 rounded-md p-2.5 bg-white text-slate-800 font-medium focus:ring-1 focus:ring-[#7A1C30]">
-                                <option value="2026" selected>2026 (Primer Año)</option>
-                                <option value="2027">2027 (Segundo Año)</option>
-                                <option value="2028">2028 (Tercer Año)</option>
-                                <option value="2029">2029 (Cuarto Año)</option>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">🏛️ Año de Administración / Meta Cuatrienal (PMD)</label>
+                            <select id="selectAnioFiscal" onchange="window.actualizarMetaAnualVisual()" required class="w-full text-xs border border-slate-300 rounded-md p-2.5 bg-white text-slate-800 font-medium focus:ring-1 focus:ring-[#7A1C30]">
+                                <option value="2026" selected>2026 (1er Año — Meta Base)</option>
+                                <option value="2027">2027 (2do Año — Meta Incremento)</option>
+                                <option value="2028">2028 (3er Año — Meta Avanzada)</option>
+                                <option value="2029">2029 (4to Año — Meta Consolidada)</option>
                             </select>
                         </div>
-                        <div class="flex items-end justify-start md:justify-end space-x-4">
+                        <div class="flex items-end">
+                            <div id="metaAnualBadgeContainer" class="w-full text-xs bg-amber-50 border border-amber-200 p-2.5 rounded-md font-bold text-amber-900 flex justify-between items-center">
+                                <span>🎯 Meta mínima exigida por el Manual:</span>
+                                <span id="labelMetaAnualValor" class="text-[#7A1C30] text-sm font-extrabold">≥ 65%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. SELECTOR DE ESTRATEGIA PMD (6.2.4.14 - 6.2.4.22) -->
+                <div class="space-y-2 bg-slate-50/50 p-4 rounded-xl border border-slate-200">
+                    <label class="block text-xs font-semibold text-slate-700">1. Seleccione la Estrategia Institucional</label>
+                    <select id="selectEstrategia" onchange="window.cambiarEstrategiaFormulario()" class="w-full text-xs border border-slate-300 rounded-md p-2.5 bg-white text-slate-800 font-medium focus:ring-1 focus:ring-[#7A1C30]">
+                        <!-- Dinámico -->
+                    </select>
+                    <p id="descObjetivoEstrategia" class="text-[11px] text-slate-500 italic mt-1.5"></p>
+                </div>
+
+                <!-- 3. MESES / PERIODOS -->
+                <div class="space-y-4 bg-slate-50/70 p-5 rounded-xl border border-slate-200">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <label class="block text-xs font-semibold text-slate-700">2. Seleccione el Mes o Corte de Evaluación:</label>
+                        <div class="space-x-4">
                             <button type="button" onclick="window.seleccionarTodosMeses(true)" class="text-[11px] text-[#7A1C30] hover:underline font-bold">✓ Marcar Todos (Anual)</button>
                             <button type="button" onclick="window.seleccionarTodosMeses(false)" class="text-[11px] text-slate-500 hover:underline font-bold">✕ Limpiar Meses</button>
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-2">📅 Seleccione los Meses que abarca este corte de avance:</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 bg-white p-3 rounded-lg border border-slate-200">
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Enero" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Enero</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Febrero" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Febrero</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Marzo" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Marzo</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Abril" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Abril</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Mayo" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Mayo</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Junio" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Junio</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Julio" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Julio</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Agosto" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Agosto</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Septiembre" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Septiembre</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Octubre" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Octubre</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Noviembre" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Noviembre</span>
-                            </label>
-                            <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded">
-                                <input type="checkbox" name="mesCheck" value="Diciembre" class="rounded text-[#7A1C30] focus:ring-[#7A1C30]"> <span>Diciembre</span>
-                            </label>
-                        </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 bg-white p-3 rounded-lg border border-slate-200">
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Enero" class="rounded text-[#7A1C30]"> <span>Enero</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Febrero" class="rounded text-[#7A1C30]"> <span>Febrero</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Marzo" class="rounded text-[#7A1C30]"> <span>Marzo</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Abril" class="rounded text-[#7A1C30]"> <span>Abril</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Mayo" class="rounded text-[#7A1C30]"> <span>Mayo</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Junio" class="rounded text-[#7A1C30]"> <span>Junio</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Julio" class="rounded text-[#7A1C30]"> <span>Julio</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Agosto" class="rounded text-[#7A1C30]"> <span>Agosto</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Septiembre" class="rounded text-[#7A1C30]"> <span>Septiembre</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Octubre" class="rounded text-[#7A1C30]"> <span>Octubre</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Noviembre" class="rounded text-[#7A1C30]"> <span>Noviembre</span></label>
+                        <label class="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer p-1.5 hover:bg-slate-50 rounded"><input type="checkbox" name="mesCheck" value="Diciembre" class="rounded text-[#7A1C30]"> <span>Diciembre</span></label>
                     </div>
                 </div>
 
-                <!-- Selector de Programas Presupuestarios (Eje 2 del 14 al 22) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Estrategia PMD (Eje 2 - Desarrollo Económico)</label>
-                        <select id="selectPrograma" onchange="window.actualizarMetaOficial()" class="w-full text-xs border border-slate-300 rounded-md p-2.5 bg-slate-50 text-slate-800 font-medium focus:ring-1 focus:ring-[#7A1C30]">
-                            <option value="Estrategia 14" data-desc="Desarrollo Turístico y Promoción Regional">14: Desarrollo Turístico</option>
-                            <option value="Estrategia 15" data-desc="Productividad y Valor Agropecuario">15: Productividad y Valor Agropecuario</option>
-                            <option value="Estrategia 16" data-desc="Desarrollo Agrícola y Apoyo al Campo">16: Desarrollo Agrícola</option>
-                            <option value="Estrategia 17" data-desc="Impulso a la Ganadería y Sanidad Pecuaria">17: Impulso a la Ganadería</option>
-                            <option value="Estrategia 18" data-desc="Fomento a la Acuacultura">18: Fomento a la Acuacultura</option>
-                            <option value="Estrategia 19" data-desc="Fomento a la Pesca Ribereña y de Altura">19: Fomento a la Pesca</option>
-                            <option value="Estrategia 20" data-desc="Fortalecimiento del Comercio y Servicios Municipales">20: Fortalecimiento del Comercio y Servicios</option>
-                            <option value="Estrategia 21" data-desc="Conectividad Territorial Productiva">21: Conectividad Territorial Productiva</option>
-                            <option value="Estrategia 22" data-desc="Empleo Inserción Laboral">22: Empleo Inserción Laboral</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Descripción del Indicador de Desempeño</label>
-                        <input type="text" id="inputIndicadorText" value="Desarrollo Turístico y Promoción Regional" readonly class="w-full text-xs bg-slate-100 border border-slate-200 rounded-md p-2.5 text-slate-600">
-                    </div>
+                <!-- EVIDENCIAS DOCUMENTALES OFICIALES -->
+                <div class="p-4 bg-amber-50/60 rounded-xl border border-amber-200 text-xs space-y-1">
+                    <p id="tituloEvidenciasOficiales" class="font-bold text-amber-950 flex items-center gap-1.5 uppercase">
+                        <i class="bi bi-file-earmark-text-fill text-amber-700 text-sm"></i> Evidencias documentales requeridas:
+                    </p>
+                    <p id="textoEvidenciasOficiales" class="text-amber-900 leading-relaxed italic"></p>
                 </div>
 
-                <!-- Campos de Metas Libres (Proyección y Realización) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Meta Programada (Proyección POA)</label>
-                        <input type="number" id="inputMetaProgramada" placeholder="Ej. 15" required oninput="window.calcularIndiceInterno()" class="w-full text-xs border border-slate-300 rounded-md p-2.5 text-slate-900 font-bold focus:ring-1 focus:ring-[#7A1C30]">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Meta Realizada en Campo</label>
-                        <input type="number" id="inputMetaAlcanzada" placeholder="Ej. 12" required oninput="window.calcularIndiceInterno()" class="w-full text-xs border border-slate-300 rounded-md p-2.5 text-slate-900 focus:ring-1 focus:ring-[#7A1C30]">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">% Cumplimiento Calculado (IE)</label>
-                        <div id="boxCalculoIE" class="text-xs font-bold text-slate-400 bg-slate-50 p-2.5 rounded border border-slate-200 text-center">
-                            0.0%
+                <!-- LÍNEAS DE ACCIÓN CON FÓRMULA Y CÁLCULO PONDERADO -->
+                <div class="space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-100 p-3 rounded-lg border border-slate-200 gap-2">
+                        <label class="block text-xs font-bold text-slate-900 uppercase tracking-wide">3. Líneas de Acción y Ponderación Estratégica (Fórmula IC)</label>
+                        <div class="text-xs font-bold text-[#7A1C30] bg-white px-3 py-1 rounded border border-slate-300 shadow-sm">
+                            Índice de Estrategia (Y<sub>j</sub>): <span id="puntajeTotalEstrategia">0.00</span> / 1.00 (100%)
                         </div>
                     </div>
+                    <div id="contenedorLineasAccion" class="space-y-4"></div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Localidad o Comunidad Beneficiada</label>
-                        <input type="text" id="inputLocalidad" placeholder="Ej. Chilapan / Tres Zapotes / Sihuapan" required class="w-full text-xs border border-slate-300 rounded-md p-2.5 text-slate-900 focus:ring-1 focus:ring-[#7A1C30]">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Descripción de la Actividad / Observaciones</label>
-                        <input type="text" id="inputDescripcion" placeholder="Ej. Taller de capacitación técnica y entrega de insumos..." required class="w-full text-xs border border-slate-300 rounded-md p-2.5 text-slate-900 focus:ring-1 focus:ring-[#7A1C30]">
-                    </div>
+                <!-- OBSERVACIONES GENERALES -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Observaciones / Descripción del Corte Mensual (Opcional)</label>
+                    <textarea id="inputDescripcion" rows="3" placeholder="Ej. Avance correspondiente a las metas programadas para el periodo..." class="w-full text-xs border border-slate-300 rounded-md p-2.5 text-slate-900 focus:ring-1 focus:ring-[#7A1C30]"></textarea>
                 </div>
 
-                <!-- 🌐 DOS COLUMNAS SEPARADAS: FOTOS (IZQ) Y PDF (DER) -->
-                <div class="border-t border-slate-100 pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-                    <!-- COLUMNA 1: SUBIR FOTOGRAFÍAS -->
-                    <div class="space-y-3 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
-                        <div class="flex justify-between items-center">
-                            <label class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                                <i class="bi bi-images text-[#7A1C30]"></i> 1. Evidencia Fotográfica (Mín. 1 Foto)
-                            </label>
-                            <span id="contadorFotos" class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
-                                0 / 1 Fotos Mínimo
-                            </span>
-                        </div>
-                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-4 bg-white text-center relative hover:bg-slate-50 transition cursor-pointer">
-                            <input type="file" id="inputFotoFile" accept="image/*" multiple onchange="window.previewMultipleImagenesBase64(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                            <p class="text-xs text-slate-600 font-medium">📷 Clic o arrastra las fotos de campo</p>
-                        </div>
-                        <div id="galeriaPreviewBox" class="hidden grid grid-cols-3 gap-2 pt-2"></div>
-                    </div>
-
-                    <!-- COLUMNA 2: CARGAR DOCUMENTO PDF -->
-                    <div class="space-y-3 bg-slate-50/70 p-4 rounded-xl border border-slate-200">
-                        <div class="flex justify-between items-center">
-                            <label class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                                <i class="bi bi-file-earmark-pdf text-red-600"></i> 2. Documento Oficial PDF (Opcional)
-                            </label>
-                            <span class="text-[10px] font-semibold text-slate-400">Máx. 900 KB</span>
-                        </div>
-                        <div class="border-2 border-dashed border-slate-300 rounded-lg p-4 bg-white text-center relative hover:bg-slate-50 transition cursor-pointer">
-                            <input type="file" id="inputPdfFile" accept="application/pdf" onchange="window.previewPdfBase64(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                            <p class="text-xs text-slate-600 font-medium">📄 Clic o arrastra el PDF oficial firmado</p>
-                        </div>
-                        <div id="previewBoxPdf" class="hidden flex items-center justify-between bg-white p-2.5 rounded-md border border-slate-200 mt-2">
-                            <div class="flex items-center space-x-2 overflow-hidden">
-                                <span class="text-lg text-red-600"><i class="bi bi-file-earmark-pdf"></i></span>
-                                <p id="nombrePdfPreview" class="text-xs font-bold text-slate-700 truncate"></p>
-                            </div>
-                            <button type="button" onclick="window.quitarPdfSeleccionado()" class="text-rose-600 hover:text-rose-800 font-bold text-xs px-2 py-1">✕</button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Botones de Acción -->
+                <!-- Botones -->
                 <div class="flex justify-end space-x-3 border-t border-slate-100 pt-4">
-                    <button type="button" id="btnCancelarEdicion" onclick="window.cancelarEdicion()" class="hidden px-4 py-2.5 text-xs font-bold text-slate-700 bg-slate-200 hover:bg-slate-300 rounded shadow-sm transition">
-                        Cancelar Edición
-                    </button>
+                    <button type="button" id="btnCancelarEdicion" onclick="window.cancelarEdicion()" class="hidden px-4 py-2.5 text-xs font-bold text-slate-700 bg-slate-200 hover:bg-slate-300 rounded shadow-sm transition">Cancelar</button>
                     <button type="submit" id="btnGuardar" class="px-5 py-2.5 text-xs font-bold text-white bg-[#7A1C30] hover:bg-[#521220] rounded shadow-sm transition flex items-center space-x-2">
-                        <span id="textoBotonGuardar">Guardar y Sincronizar en Firebase</span>
+                        <i class="bi bi-send-fill"></i>
+                        <span id="textoBotonGuardar">Enviar Expediente Mensual a Contraloría</span>
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- Tabla de Registros Guardados -->
+        <!-- Historial Operativo con Doble Lectura -->
         <div class="gob-card p-6 bg-white border border-slate-200 shadow-sm space-y-4">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3">
                 <div>
-                    <h3 class="text-sm font-bold text-slate-900">Historial de Reportes — Eje 2: Desarrollo Económico que Genera</h3>
-                    <p class="text-xs text-slate-500">Consulte, edite o elimine los registros capturados de este eje.</p>
+                    <h3 class="text-sm font-bold text-slate-900" id="tituloHistorialEstrategia">Historial de Cortes de la Estrategia</h3>
+                    <p class="text-[11px] text-slate-500">Mostrando registro de avances, cumplimiento anual y su aporte al cuatrienio.</p>
                 </div>
-                <div class="w-full md:w-64">
-                    <input type="text" id="inputBuscarDept" onkeyup="window.filtrarTablaDept()" placeholder="🔍 Buscar..." class="w-full text-xs border border-slate-300 rounded-md p-2 bg-slate-50">
+                <div class="bg-amber-50 border border-amber-200 px-4 py-2 rounded-lg text-right">
+                    <span class="block text-[10px] font-bold text-amber-900 uppercase">Evaluación del Año Seleccionado</span>
+                    <span id="sumaAcumuladaTabla" class="text-sm font-extrabold text-[#7A1C30]">0.0% (0.0% del Cuatrienio)</span>
                 </div>
             </div>
 
@@ -260,360 +178,585 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
-                            <th class="p-3">Programa Presupuestario y Periodo</th>
-                            <th class="p-3">Área / Sector y Descripción</th>
-                            <th class="p-3 text-center">Metas (Prog/Real)</th>
-                            <th class="p-3 text-center">% IE</th>
-                            <th class="p-3 text-center">Evidencia (Foto / PDF)</th>
-                            <th class="p-3">Estatus y Comentarios</th>
+                            <th class="p-3">Estrategia</th>
+                            <th class="p-3">Año / Periodo</th>
+                            <th class="p-3 text-center">Evidencias del Periodo</th>
+                            <th class="p-3 text-center">Índice (Y<sub>j</sub>)</th>
+                            <th class="p-3">Estatus Institucional</th>
                             <th class="p-3 text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tbodyDept" class="divide-y divide-slate-100 text-xs text-slate-700">
-                        <tr><td colspan="7" class="p-6 text-center text-slate-400 italic">Cargando registros...</td></tr>
+                        <tr><td colspan="6" class="p-6 text-center text-slate-400 italic">Cargando expedientes...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- MODAL CARRUSEL INTERACTIVO DE FOTOGRAFÍAS -->
-    <div id="modalCarrusel" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="relative max-w-4xl w-full bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 p-6 flex flex-col items-center space-y-4">
-            <div class="w-full flex justify-between items-center border-b border-slate-800 pb-3">
+    <!-- Modal de Matriz Normativa y Parámetros para la Contraloría -->
+    <div id="modalAyudaEje" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-5xl w-full p-6 space-y-4 relative border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center border-b pb-3">
                 <div>
-                    <h3 id="carruselTitulo" class="text-sm font-bold text-white">Evidencia Fotográfica de Campo</h3>
-                    <p id="carruselSubtitulo" class="text-[11px] text-amber-300 italic">Inspección de avance institucional</p>
+                    <h3 class="text-sm font-bold text-[#7A1C30] flex items-center gap-2">
+                        <i class="bi bi-journal-check text-base"></i> Matriz Oficial del Manual de Evaluación — Eje 2: Desarrollo Económico que Genera
+                    </h3>
+                    <p class="text-[11px] text-slate-500">Parámetros, líneas base, fórmulas matemáticas y metas progresivas (2026-2029).</p>
                 </div>
-                <button type="button" onclick="window.cerrarCarrusel()" class="text-slate-400 hover:text-white font-bold text-xl px-2 py-1">✕ Cerrar</button>
+                <button type="button" onclick="window.cerrarModalAyuda()" class="text-slate-400 hover:text-slate-700 font-bold text-lg px-2">✕</button>
             </div>
-            <div class="relative w-full h-[60vh] flex items-center justify-center bg-black/50 rounded-xl overflow-hidden border border-slate-800">
-                <button type="button" onclick="window.cambiarFotoCarrusel(-1)" class="absolute left-3 z-10 bg-black/70 hover:bg-[#7A1C30] text-white p-3 rounded-full font-bold transition shadow-lg">❮</button>
-                <img id="carruselImagenActiva" class="max-h-full max-w-full object-contain transition-all duration-300 rounded-lg shadow-xl" alt="Evidencia">
-                <button type="button" onclick="window.cambiarFotoCarrusel(1)" class="absolute right-3 z-10 bg-black/70 hover:bg-[#7A1C30] text-white p-3 rounded-full font-bold transition shadow-lg">❯</button>
-            </div>
-            <div class="w-full flex justify-between items-center pt-2 border-t border-slate-800 text-xs text-slate-400">
-                <span id="carruselContador" class="font-bold text-amber-200">Foto 1 de 5</span>
-                <span class="italic text-[11px]">Use las flechas laterales para navegar entre las evidencias de campo.</span>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal de Ayuda / Matriz del Manual -->
-    <div id="modalAyudaPMD" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-5xl w-full p-6 space-y-4 border border-slate-200 flex flex-col max-h-[90vh]">
-            
-            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-lg bg-[#7A1C30] text-white flex items-center justify-center font-bold text-base shadow-sm">📖</div>
-                    <div>
-                        <h3 class="text-sm font-bold text-slate-900">Manual Normativo y Matriz de Alineación Oficial (PMD & Plan Veracruzano)</h3>
-                        <p class="text-[11px] text-slate-500">Consulte la matriz institucional, visualice el manual o descárguelo en PDF.</p>
+            <div class="text-xs text-slate-700 space-y-4 overflow-y-auto pr-2 flex-1">
+                <!-- Fórmulas Oficiales -->
+                <div class="bg-amber-50/80 p-3 rounded-lg border border-amber-200 space-y-2">
+                    <p class="font-bold text-amber-950 uppercase tracking-wide text-[11px]">📐 Fórmulas de Cálculo Oficiales del Manual:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-800">
+                        <div class="bg-white p-2.5 rounded border border-amber-200">
+                            <p class="font-bold text-[#7A1C30]">Índice de cada Estrategia (Y<sub>j</sub>):</p>
+                            <p class="font-mono text-center my-1.5 text-sm font-bold text-slate-900">Y<sub>j</sub>(t) = ∑ w<sub>ij</sub> · C<sub>ijt</sub></p>
+                            <p class="text-[10px] text-slate-500">Donde w<sub>ij</sub> es la ponderación de cada línea de acción (∑w = 1) y C<sub>ijt</sub> es el grado de cumplimiento (0 o 1).</p>
+                        </div>
+                        <div class="bg-white p-2.5 rounded border border-amber-200">
+                            <p class="font-bold text-[#7A1C30]">Índice del Eje Rector (IE<sub>eje</sub>):</p>
+                            <p class="font-mono text-center my-1.5 text-sm font-bold text-slate-900">IE<sub>eje</sub>(t) = (1 / 9) ∑ Y<sub>j</sub>(t)</p>
+                            <p class="text-[10px] text-slate-500">Promedio aritmético de las 9 estrategias (E 14 a E 22) que conforman el Eje 2.</p>
+                        </div>
                     </div>
                 </div>
-                <button type="button" onclick="window.cerrarModalAyudaPMD()" class="text-slate-400 hover:text-slate-700 text-xl font-bold px-2 py-1">✕</button>
-            </div>
-            
-            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <div class="flex items-center space-x-2 text-xs text-slate-700 font-medium">
-                    <span>📚</span>
-                    <span>Documento rector del Plan Municipal de Desarrollo 2026-2029</span>
+
+                <!-- Tabla Detallada del Manual -->
+                <div>
+                    <p class="font-bold text-slate-800 mb-2">📋 Catálogo de las 9 Estrategias y sus Metas Progresivas Anuales:</p>
+                    <div class="border border-slate-200 rounded-lg overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-[11px]">
+                            <thead>
+                                <tr class="bg-[#7A1C30] text-white font-bold uppercase">
+                                    <th class="p-2 border-r border-[#521220]">Programa / Estrategia</th>
+                                    <th class="p-2 border-r border-[#521220] text-center">Líneas (n)</th>
+                                    <th class="p-2 border-r border-[#521220]">Indicador (IC)</th>
+                                    <th class="p-2 border-r border-[#521220]">Línea Base</th>
+                                    <th class="p-2 border-r border-[#521220]">Metas Anuales (1° al 4°)</th>
+                                    <th class="p-2">Área Responsable</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <tr>
+                                    <td class="p-2 font-semibold">PI 14: Desarrollo Turístico</td>
+                                    <td class="p-2 text-center font-bold">6</td>
+                                    <td class="p-2">ICDT</td>
+                                    <td class="p-2">&lt; 56.4%</td>
+                                    <td class="p-2 font-medium">65% | 75% | 85% | 90%</td>
+                                    <td class="p-2">Coordinación de Turismo</td>
+                                </tr>
+                                <tr class="bg-slate-50">
+                                    <td class="p-2 font-semibold">PI 15: Productividad y Valor Agropecuario</td>
+                                    <td class="p-2 text-center font-bold">6</td>
+                                    <td class="p-2">ICPVA</td>
+                                    <td class="p-2">&lt; 30.2%</td>
+                                    <td class="p-2 font-medium">45% | 55% | 70% | 80%</td>
+                                    <td class="p-2">Coordinación de Desarrollo Rural</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-semibold">PI 16: Desarrollo Agrícola</td>
+                                    <td class="p-2 text-center font-bold">5</td>
+                                    <td class="p-2">ICDA</td>
+                                    <td class="p-2">&lt; 30.2%</td>
+                                    <td class="p-2 font-medium">45% | 55% | 70% | 80%</td>
+                                    <td class="p-2">Coordinación de Desarrollo Rural</td>
+                                </tr>
+                                <tr class="bg-slate-50">
+                                    <td class="p-2 font-semibold">PI 17: Impulso a la Ganadería</td>
+                                    <td class="p-2 text-center font-bold">5</td>
+                                    <td class="p-2">ICDG</td>
+                                    <td class="p-2">&lt; 30.2%</td>
+                                    <td class="p-2 font-medium">45% | 55% | 70% | 80%</td>
+                                    <td class="p-2">Coordinación de Ganadería</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-semibold">PI 18: Fomento a la Acuacultura</td>
+                                    <td class="p-2 text-center font-bold">5</td>
+                                    <td class="p-2">ICDA</td>
+                                    <td class="p-2">&lt; 30.2%</td>
+                                    <td class="p-2 font-medium">50% | 60% | 70% | 80%</td>
+                                    <td class="p-2">Coordinación de Acuacultura y Pesca</td>
+                                </tr>
+                                <tr class="bg-slate-50">
+                                    <td class="p-2 font-semibold">PI 19: Fomento a la Pesca</td>
+                                    <td class="p-2 text-center font-bold">5</td>
+                                    <td class="p-2">ICDPS</td>
+                                    <td class="p-2">&lt; 30.2%</td>
+                                    <td class="p-2 font-medium">50% | 60% | 70% | 80%</td>
+                                    <td class="p-2">Coordinación de Acuacultura y Pesca</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-semibold">PI 20: Fortalecimiento del Comercio y Servicios</td>
+                                    <td class="p-2 text-center font-bold">6</td>
+                                    <td class="p-2">ICFCS</td>
+                                    <td class="p-2">&lt; 30.2%</td>
+                                    <td class="p-2 font-medium">50% | 60% | 75% | 85%</td>
+                                    <td class="p-2">Fomento Empresarial y Comercio</td>
+                                </tr>
+                                <tr class="bg-slate-50">
+                                    <td class="p-2 font-semibold">PI 21: Conectividad Territorial Productiva</td>
+                                    <td class="p-2 text-center font-bold">6</td>
+                                    <td class="p-2">ICCTP</td>
+                                    <td class="p-2">&lt; 30.2%</td>
+                                    <td class="p-2 font-medium">45% | 60% | 70% | 80%</td>
+                                    <td class="p-2">Impulso Económico / Obras Públicas</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-semibold">PI 22: Empleo e Inserción Laboral</td>
+                                    <td class="p-2 text-center font-bold">6</td>
+                                    <td class="p-2">ICEIL</td>
+                                    <td class="p-2">&lt; 30.2%</td>
+                                    <td class="p-2 font-medium">45% | 60% | 70% | 80%</td>
+                                    <td class="p-2">Impulso Económico</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button type="button" onclick="window.verImagenManual()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-bold transition flex items-center gap-1">
-                        🖼️ Ver Imagen del Manual
-                    </button>
-                    <a href="#" onclick="window.descargarManualPDF(event)" class="px-3 py-1.5 bg-[#7A1C30] text-white hover:bg-[#521220] rounded text-xs font-bold transition shadow-sm flex items-center gap-1">
-                        📥 Descargar Manual Oficial (PDF)
-                    </a>
-                </div>
             </div>
 
-            <div class="overflow-y-auto pr-1 flex-1 border border-slate-200 rounded-lg">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="bg-[#7A1C30] text-white text-[11px] font-bold uppercase text-center">
-                            <th class="p-3 border-r border-[#521220] w-1/3">Plan Municipal de Desarrollo de San Andrés Tuxtla 2026-2029</th>
-                            <th class="p-3 border-r border-[#521220] w-1/3">Eje / Objetivo (Plan Veracruzano de Desarrollo 2025-2030)</th>
-                            <th class="p-3 w-1/3">Estrategia Estatal Relacionada</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200 text-slate-700 align-top">
-                        <tr class="hover:bg-slate-50">
-                            <td class="p-3 font-semibold text-[#7A1C30] border-r">
-                                <span class="block font-bold mb-1 text-slate-900">Eje 2: Desarrollo Económico que Genera</span>
-                                14: Desarrollo Turístico<br>
-                                15: Productividad y Valor Agropecuario<br>
-                                16: Desarrollo Agrícola<br>
-                                17: Impulso a la Ganadería<br>
-                                18: Fomento a la Acuacultura<br>
-                                19: Fomento a la Pesca<br>
-                                20: Fortalecimiento del Comercio y Servicios
-                            </td>
-                            <td class="p-3 border-r">
-                                <strong class="text-slate-900 block mb-1">Eje Rector 2: Veracruz con Economía y Sustentabilidad</strong>
-                                Incrementar el crecimiento de la economía de la entidad mediante la promoción de inversiones que generen empleos seguros y bien pagados bajo criterios de sustentabilidad.
-                            </td>
-                            <td class="p-3 space-y-2">
-                                <p><strong>2.3</strong> Diversificar la oferta turística del Estado de Veracruz convirtiendo al sector en un motor de desarrollo equilibrado y sustentable.</p>
-                                <p><strong>2.2</strong> Desarrollar proyectos estratégicos agropecuarios y pesqueros para mejorar la producción y rentabilidad de los pequeños productores.</p>
-                                <p><strong>2.1</strong> Potenciar las ventajas competitivas de Veracruz para incrementar la producción industrial, comercial y portuaria.</p>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="p-3 font-semibold text-[#7A1C30] border-r">
-                                21: Conectividad Territorial Productiva
-                            </td>
-                            <td class="p-3 border-r">
-                                <strong class="text-slate-900 block mb-1">Eje Rector 3: Veracruz con Infraestructura y Movilidad</strong>
-                                Impulsar el desarrollo territorial y la movilidad para mejorar la conectividad, los servicios públicos y la calidad de vida.
-                            </td>
-                            <td class="p-3">
-                                <p><strong>3.1</strong> Fortalecer la infraestructura carretera facilitando el tránsito adecuado y seguro de personas y bienes.</p>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-slate-50">
-                            <td class="p-3 font-semibold text-[#7A1C30] border-r">
-                                22: Empleo Inserción Laboral
-                            </td>
-                            <td class="p-3 border-r">
-                                <strong class="text-slate-900 block mb-1">Eje Rector 2: Veracruz con Economía y Sustentabilidad</strong>
-                                Impulsar el empleo formal y la vinculación laboral productiva.
-                            </td>
-                            <td class="p-3">
-                                <p><strong>2.5</strong> Incentivar la generación de empleos dignos y remunerados para reducir la informalidad y garantizar la justicia laboral.</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="flex justify-between items-center pt-2 border-t border-slate-200">
-                <span class="text-[11px] text-slate-500 italic">* Fuente: Plan Municipal de Desarrollo 2026-2029 y Plan Veracruzano de Desarrollo 2025-2030.</span>
-                <button type="button" onclick="window.cerrarModalAyudaPMD()" class="px-4 py-2 text-xs text-white bg-[#7A1C30] hover:bg-[#521220] rounded-md font-semibold transition shadow-sm">Entendido, cerrar</button>
+            <div class="border-t pt-3 flex justify-between items-center">
+                <span class="text-[11px] text-slate-400 italic">Validado conforme a los anexos técnicos del Plan Municipal de Desarrollo 2026-2029.</span>
+                <button type="button" onclick="window.cerrarModalAyuda()" class="px-4 py-2 bg-[#7A1C30] text-white rounded text-xs font-bold hover:bg-[#521220]">Cerrar Matriz</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Visor de Imagen (Lightbox) -->
-    <div id="modalImagen" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4" onclick="window.cerrarImagenCompleta()">
-        <div class="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center p-2" onclick="event.stopPropagation()">
-            <button type="button" onclick="window.cerrarImagenCompleta()" class="absolute -top-10 right-0 text-white font-bold text-2xl">✕ Cerrar</button>
-            <img id="imgCompleta" class="max-h-[80vh] max-w-full object-contain rounded-lg shadow-2xl border">
-            <p id="imgPieTitulo" class="text-xs text-slate-300 mt-3 font-medium bg-slate-900/80 px-4 py-1.5 rounded-full"></p>
-        </div>
-    </div>
-
-    <!-- Modal Confirmación Eliminación -->
-    <div id="modalEliminar" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 space-y-4 border border-slate-200 text-center">
-            <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto text-xl font-bold border border-rose-200">⚠️</div>
-            <div class="space-y-1">
-                <h3 class="text-sm font-bold text-slate-900">¿Eliminar Registro?</h3>
-                <p class="text-xs text-slate-500">Esta acción borrará permanentemente el reporte de Firestore.</p>
-            </div>
-            <input type="hidden" id="deleteDocId">
-            <div class="flex justify-center space-x-3 pt-2">
-                <button type="button" onclick="window.cerrarModalEliminar()" class="px-4 py-2 text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-md font-semibold transition">Cancelar</button>
-                <button type="button" onclick="window.ejecutarEliminacionBD()" class="px-4 py-2 text-xs text-white bg-rose-700 hover:bg-rose-800 rounded-md font-semibold shadow-sm transition">Sí, Eliminar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts de la página -->
     <script src="../js/app.js"></script>
     <script>
-        let fotosEvidenciaArray = [];
-        let pdfBase64 = "";
-        let nombrePdf = "";
+        // 📋 CATÁLOGO OFICIAL DEL EJE 2 (Estrategias 6.2.4.14 a 6.2.4.22)
+        const catalogoPMD_Eje2 = {
+            "E14": {
+                nombre: "Estrategia 6.2.4.14: Desarrollo turístico",
+                numEvidencia: "Evidencia 14",
+                evidenciasTexto: "Inventario turístico, programas de promoción, registros de capacitación, eventos realizados, materiales de difusión.",
+                objetivo: "Fortalecer el turismo como actividad complementaria, sostenible y generadora de ingresos, aprovechando los recursos del municipio.",
+                metasAnuales: { "2026": "≥ 65%", "2027": "≥ 75%", "2028": "≥ 85%", "2029": "≥ 90%" },
+                lineas: [
+                    { texto: "1. Identificar, catalogar y jerarquizar los atractivos turísticos naturales, culturales y gastronómicos del municipio.", peso: 0.15 },
+                    { texto: "2. Impulsar el desarrollo del turismo comunitario y rural mediante modelos de gestión participativa.", peso: 0.15 },
+                    { texto: "3. Fortalecer el posicionamiento y la promoción turística del municipio a nivel regional y estatal.", peso: 0.20 },
+                    { texto: "4. Mejorar la infraestructura de servicios básicos y rehabilitar la imagen urbana en zonas turísticas.", peso: 0.20 },
+                    { texto: "5. Capacitar de manera integral a los prestadores de servicios turísticos en estándares de hospitalidad y calidad.", peso: 0.15 },
+                    { texto: "6. Promover un calendario anual de eventos culturales y turísticos que fortalezcan la identidad local.", peso: 0.15 }
+                ]
+            },
+            "E15": {
+                nombre: "Estrategia 6.2.4.15: Productividad y valor agropecuario",
+                numEvidencia: "Evidencia 15",
+                evidenciasTexto: "Padrones de productores, reportes de asistencia técnica, proyectos productivos, apoyos gestionados, infraestructura ejecutada.",
+                objetivo: "Incrementar la productividad y rentabilidad del sector agropecuario mediante el fortalecimiento de capacidades y la mejora de infraestructura.",
+                metasAnuales: { "2026": "≥ 45%", "2027": "≥ 55%", "2028": "≥ 70%", "2029": "≥ 80%" },
+                lineas: [
+                    { texto: "1. Fortalecer la asistencia técnica y capacitación a productores agropecuarios para mejorar rendimientos.", peso: 0.20 },
+                    { texto: "2. Mejorar la infraestructura productiva rural y de apoyo a la producción para reducir costos.", peso: 0.20 },
+                    { texto: "3. Impulsar la organización de productores y su articulación a cadenas de valor y comercialización.", peso: 0.20 },
+                    { texto: "4. Facilitar el acceso de productores a programas, apoyos y financiamiento sectorial.", peso: 0.15 },
+                    { texto: "5. Promover prácticas productivas sostenibles y de cuidado ambiental.", peso: 0.15 },
+                    { texto: "6. Fomentar la diversificación productiva y el valor agregado a productos locales.", peso: 0.10 }
+                ]
+            },
+            "E16": {
+                nombre: "Estrategia 6.2.4.16: Desarrollo agrícola",
+                numEvidencia: "Evidencia 16",
+                evidenciasTexto: "Programas de capacitación, reportes de asistencia técnica, padrones de beneficiarios, informes de tecnificación e infraestructura.",
+                objetivo: "Impulsar el desarrollo agrícola del municipio mediante el fortalecimiento de la productividad y el uso sostenible de los recursos.",
+                metasAnuales: { "2026": "≥ 45%", "2027": "≥ 55%", "2028": "≥ 70%", "2029": "≥ 80%" },
+                lineas: [
+                    { texto: "1. Impulsar asistencia técnica en manejo regenerativo de suelos y optimización de insumos.", peso: 0.20 },
+                    { texto: "2. Promover la diversificación de cultivos y reconversión productiva.", peso: 0.20 },
+                    { texto: "3. Fortalecer la infraestructura hidroagrícola y logística (centros de almacenamiento).", peso: 0.20 },
+                    { texto: "4. Facilitar el acceso a semillas certificadas e insumos de calidad.", peso: 0.20 },
+                    { texto: "5. Fomentar una agricultura climáticamente inteligente y resiliente.", peso: 0.20 }
+                ]
+            },
+            "E17": {
+                nombre: "Estrategia 6.2.4.17: Impulso a la ganadería",
+                numEvidencia: "Evidencia 17",
+                evidenciasTexto: "Registros sanitarios, padrones ganaderos, constancias de mejora genética, informes de infraestructura pecuaria.",
+                objetivo: "Fortalecer la actividad ganadera del municipio mediante el mejoramiento de la productividad y el manejo racional de los recursos.",
+                metasAnuales: { "2026": "≥ 45%", "2027": "≥ 55%", "2028": "≥ 70%", "2029": "≥ 80%" },
+                lineas: [
+                    { texto: "1. Capacitar técnicamente en manejo sanitario, nutrición animal avanzada y mejora genética.", peso: 0.20 },
+                    { texto: "2. Modernizar la infraestructura pecuaria (corrales, cercos y abrevaderos).", peso: 0.20 },
+                    { texto: "3. Promover la vigilancia epidemiológica y estándares de inocuidad.", peso: 0.20 },
+                    { texto: "4. Fomentar organizaciones de ganaderos para optimizar la comercialización.", peso: 0.20 },
+                    { texto: "5. Transitar hacia prácticas ganaderas sostenibles y sistemas silvopastoriles.", peso: 0.20 }
+                ]
+            },
+            "E18": {
+                nombre: "Estrategia 6.2.4.18: Fomento a la acuacultura",
+                numEvidencia: "Evidencia 18",
+                evidenciasTexto: "Padrones de acuicultores, registros de capacitación en bioseguridad, informes de infraestructura acuícola.",
+                objetivo: "Promover el desarrollo sostenible de la acuacultura mediante el aprovechamiento responsable de los recursos hídricos.",
+                metasAnuales: { "2026": "≥ 50%", "2027": "≥ 60%", "2028": "≥ 70%", "2029": "≥ 80%" },
+                lineas: [
+                    { texto: "1. Fomentar capacitación especializada en bioseguridad y producción acuícola.", peso: 0.20 },
+                    { texto: "2. Impulsar la modernización y mantenimiento de infraestructura (estanques y aireación).", peso: 0.20 },
+                    { texto: "3. Promover la diversificación de especies con alto potencial comercial.", peso: 0.20 },
+                    { texto: "4. Facilitar el acceso a financiamiento y programas de concurrencia.", peso: 0.20 },
+                    { texto: "5. Fomentar prácticas sostenibles y sistemas de recirculación para proteger el agua.", peso: 0.20 }
+                ]
+            },
+            "E19": {
+                nombre: "Estrategia 6.2.4.19: Fomento a la pesca",
+                numEvidencia: "Evidencia 19",
+                evidenciasTexto: "Padrones de pescadores, registros de capacitación en captura responsable, inventario de artes de pesca y red de frío.",
+                objetivo: "Fomentar el aprovechamiento sustentable de los recursos pesqueros del municipio para garantizar la continuidad de la actividad.",
+                metasAnuales: { "2026": "≥ 50%", "2027": "≥ 60%", "2028": "≥ 70%", "2029": "≥ 80%" },
+                lineas: [
+                    { texto: "1. Impulsar capacitación en captura responsable y manejo higiénico de productos.", peso: 0.20 },
+                    { texto: "2. Promover artes de pesca sustentables y selectivas.", peso: 0.20 },
+                    { texto: "3. Modernizar la infraestructura básica (puntos de desembarque y red de frío).", peso: 0.20 },
+                    { texto: "4. Fomentar la consolidación de organizaciones pesqueras.", peso: 0.20 },
+                    { texto: "5. Promover esquemas de ordenamiento y planes de manejo pesquero.", peso: 0.20 }
+                ]
+            },
+            "E20": {
+                nombre: "Estrategia 6.2.4.20: Fortalecimiento del comercio y servicios",
+                numEvidencia: "Evidencia 20",
+                evidenciasTexto: "Padrones de comercios formalizados, registros de capacitación empresarial, expedientes de ferias comerciales.",
+                objetivo: "Fortalecer a las micro, pequeñas y medianas unidades económicas del sector comercio y servicios.",
+                metasAnuales: { "2026": "≥ 50%", "2027": "≥ 60%", "2028": "≥ 75%", "2029": "≥ 85%" },
+                lineas: [
+                    { texto: "1. Promover la formalización y regularización mediante incentivos y simplificación administrativa.", peso: 0.20 },
+                    { texto: "2. Fortalecer capacidades empresariales con capacitación y consultoría especializada.", peso: 0.15 },
+                    { texto: "3. Impulsar la inclusión financiera y apoyos directos a emprendedores.", peso: 0.15 },
+                    { texto: "4. Promover la transformación digital y comercio electrónico en comercios locales.", peso: 0.15 },
+                    { texto: "5. Fortalecer el mercado interno y consumo local mediante ferias comerciales.", peso: 0.20 },
+                    { texto: "6. Mejorar la infraestructura urbana y ordenamiento territorial en zonas comerciales.", peso: 0.15 }
+                ]
+            },
+            "E21": {
+                nombre: "Estrategia 6.2.4.21: Conectividad territorial productiva",
+                numEvidencia: "Evidencia 21",
+                evidenciasTexto: "Inventario de caminos rurales, expedientes técnicos de rehabilitación vial, actas de entrega de obra.",
+                objetivo: "Mejorar la conectividad territorial y productiva del municipio para reducir costos de traslado y facilitar mercados.",
+                metasAnuales: { "2026": "≥ 45%", "2027": "≥ 60%", "2028": "≥ 70%", "2029": "≥ 80%" },
+                lineas: [
+                    { texto: "1. Identificar y jerarquizar caminos rurales y rutas saca-cosechas estratégicas.", peso: 0.20 },
+                    { texto: "2. Rehabilitar integralmente tramos carreteros que conectan zonas de producción con centros de abasto.", peso: 0.20 },
+                    { texto: "3. Fortalecer la conectividad terrestre entre localidades rurales y la cabecera municipal.", peso: 0.15 },
+                    { texto: "4. Coordinar esquemas de concurrencia con Estado y Federación para obra vial.", peso: 0.15 },
+                    { texto: "5. Promover el mantenimiento preventivo y conservación de caminos.", peso: 0.15 },
+                    { texto: "6. Incorporar criterios de seguridad vial y sostenibilidad ambiental en caminos.", peso: 0.15 }
+                ]
+            },
+            "E22": {
+                nombre: "Estrategia 6.2.4.22: Empleo e inserción laboral",
+                numEvidencia: "Evidencia 22",
+                evidenciasTexto: "Listados de ferias de empleo, reportes de vinculación laboral, constancias de capacitación para el trabajo.",
+                objetivo: "Promover la generación de empleo digno y la inserción laboral de la población, fortaleciendo la economía local.",
+                metasAnuales: { "2026": "≥ 45%", "2027": "≥ 60%", "2028": "≥ 70%", "2029": "≥ 80%" },
+                lineas: [
+                    { texto: "1. Promover mecanismos de vinculación laboral efectiva entre empresas y buscadores de empleo.", peso: 0.20 },
+                    { texto: "2. Impulsar programas de capacitación para el trabajo y autoempleo.", peso: 0.15 },
+                    { texto: "3. Fomentar el empleo juvenil y la inclusión laboral de grupos vulnerables.", peso: 0.15 },
+                    { texto: "4. Promover proyectos productivos estratégicos detonadores de empleo local.", peso: 0.15 },
+                    { texto: "5. Coordinar la oferta educativa y técnica con las demandas reales del mercado laboral.", peso: 0.15 },
+                    { texto: "6. Difundir proactivamente vacantes mediante plataformas digitales y ferias de empleo.", peso: 0.20 }
+                ]
+            }
+        };
+
+        let evidenciasPorLineaMap = {};
         let reportesLocales = [];
-        let carruselFotosActuales = [];
-        let carruselIndiceActual = 0;
 
         function mostrarNotificacion(mensaje, tipo = 'exito') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            const bgColor = tipo === 'exito' ? 'bg-emerald-900/95 text-white' : 'bg-rose-900/95 text-white';
-            toast.className = `pointer-events-auto px-4 py-3 rounded-lg shadow-xl text-xs font-semibold transition-all ${bgColor}`;
-            toast.innerHTML = `<span>${mensaje}</span>`;
+            const isExito = tipo === 'exito';
+            const bgColor = isExito ? 'bg-slate-900 text-white border-l-4 border-emerald-500' : 'bg-slate-900 text-white border-l-4 border-rose-500';
+            const icon = isExito ? '<i class="bi bi-check-circle-fill text-emerald-400 text-base"></i>' : '<i class="bi bi-exclamation-triangle-fill text-rose-400 text-base"></i>';
+
+            toast.className = `pointer-events-auto flex items-center space-x-3 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold transition-all transform translate-y-2 opacity-0 duration-300 ${bgColor}`;
+            toast.innerHTML = `${icon}<span>${mensaje}</span>`;
             container.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const tipoUsuario = localStorage.getItem("tipoUsuario");
-                const sesion = JSON.parse(localStorage.getItem("sesion_pmd_sat") || "{}");
-                
-                const labelNavbar = document.getElementById('labelUsuarioNavbar');
-                if (labelNavbar) {
-                    const nombreMostrar = sesion.nombreDep || sesion.usuario || "Operativo";
-                    labelNavbar.innerText = nombreMostrar.toUpperCase();
-                }
+        document.addEventListener('DOMContentLoaded', async () => {
+            const sesion = JSON.parse(localStorage.getItem("sesion_pmd_sat") || "{}");
+            const labelNavbar = document.getElementById('labelUsuarioNavbar');
+            if (labelNavbar) labelNavbar.innerText = (sesion.nombreDep || sesion.usuario || "Operativo").toUpperCase();
 
-                const linkDashboard = document.getElementById('linkDashboard');
-                if (linkDashboard) {
-                    if (tipoUsuario === 'admin') {
-                        linkDashboard.classList.remove('hidden');
-                    } else {
-                        linkDashboard.classList.add('hidden');
-                    }
-                }
+            const linkDashboard = document.getElementById('linkDashboard');
+            if (linkDashboard && localStorage.getItem("tipoUsuario") === 'admin') linkDashboard.classList.remove('hidden');
 
-                if (typeof obtenerReportesBD === 'function') cargarTablaRegistros();
-            }, 500);
+            const selectEstr = document.getElementById('selectEstrategia');
+            if (selectEstr) {
+                selectEstr.innerHTML = "";
+                Object.keys(catalogoPMD_Eje2).forEach(key => {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.text = catalogoPMD_Eje2[key].nombre;
+                    selectEstr.appendChild(opt);
+                });
+            }
+
+            window.cambiarEstrategiaFormulario(true);
+            if (typeof obtenerReportesBD === 'function') {
+                reportesLocales = await obtenerReportesBD();
+                cargarTablaRegistros();
+            }
         });
 
-        // 🔘 Función para Marcar o Desmarcar Todos los Meses del Checklist
-        window.seleccionarTodosMeses = function(marcar) {
-            document.querySelectorAll('input[name="mesCheck"]').forEach(cb => cb.checked = marcar);
+        window.abrirModalAyuda = () => document.getElementById('modalAyudaEje').classList.remove('hidden');
+        window.cerrarModalAyuda = () => document.getElementById('modalAyudaEje').classList.add('hidden');
+
+        window.actualizarMetaAnualVisual = function() {
+            const anio = document.getElementById('selectAnioFiscal').value;
+            const claveEstr = document.getElementById('selectEstrategia').value;
+            const info = catalogoPMD_Eje2[claveEstr];
+            const metaObj = info ? info.metasAnuales[anio] : "≥ 65%";
+            document.getElementById('labelMetaAnualValor').innerText = metaObj;
         };
 
-        window.abrirModalAyudaPMD = () => document.getElementById('modalAyudaPMD').classList.remove('hidden');
-        window.cerrarModalAyudaPMD = () => document.getElementById('modalAyudaPMD').classList.add('hidden');
+        window.cambiarEstrategiaFormulario = function(limpiarMap = true) {
+            const claveEstr = document.getElementById('selectEstrategia').value;
+            const info = catalogoPMD_Eje2[claveEstr] || catalogoPMD_Eje2["E14"];
 
-        window.verImagenManual = function() {
-            const srcImg = "../img/manual_pmd_ref.png";
-            document.getElementById('imgCompleta').src = srcImg;
-            document.getElementById('imgPieTitulo').innerText = "Manual Normativo y Matriz Oficial PMD 2026-2029";
-            document.getElementById('modalImagen').classList.remove('hidden');
+            if (limpiarMap) {
+                evidenciasPorLineaMap = {};
+                document.getElementById('editReportId').value = "";
+                document.getElementById('inputDescripcion').value = "";
+                document.getElementById('tituloFormulario').innerText = "Integración de Expediente — Eje 2: Desarrollo Económico que Genera";
+                document.getElementById('badgeEstatusForm').innerText = "Estatus: Pendiente de Envío";
+                document.getElementById('badgeEstatusForm').className = "px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded text-xs font-bold";
+                document.getElementById('textoBotonGuardar').innerText = "Enviar Expediente Mensual a Contraloría";
+                document.getElementById('btnCancelarEdicion').classList.add('hidden');
+                document.querySelectorAll('input[name="mesCheck"]').forEach(cb => cb.checked = false);
+            }
+
+            document.getElementById('descObjetivoEstrategia').innerText = info.objetivo;
+            document.getElementById('tituloEvidenciasOficiales').innerHTML = `<i class="bi bi-file-earmark-text-fill text-amber-700 text-sm"></i> Evidencias documentales requeridas (${info.numEvidencia}):`;
+            document.getElementById('textoEvidenciasOficiales').innerText = info.evidenciasTexto;
+            
+            window.actualizarMetaAnualVisual();
+
+            const tituloHistorial = document.getElementById('tituloHistorialEstrategia');
+            if (tituloHistorial) tituloHistorial.innerText = `Historial de Cortes — ${info.nombre}`;
+
+            const contenedor = document.getElementById('contenedorLineasAccion');
+            contenedor.innerHTML = "";
+
+            info.lineas.forEach((laObj, idx) => {
+                const lineaKey = `linea_${idx + 1}`;
+                if (!evidenciasPorLineaMap[lineaKey]) {
+                    evidenciasPorLineaMap[lineaKey] = { 
+                        pdf: null, 
+                        imagenes: [], 
+                        peso: laObj.peso,
+                        cumplida: false,
+                        puntajePonderado: 0 
+                    };
+                }
+                const datosLinea = evidenciasPorLineaMap[lineaKey];
+                datosLinea.peso = laObj.peso;
+
+                const card = document.createElement('div');
+                card.className = "p-4 bg-white rounded-xl border border-slate-200 shadow-sm space-y-3";
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                        <span class="text-xs font-bold text-slate-900">• ${laObj.texto}</span>
+                        <div class="flex items-center space-x-2 bg-slate-50 px-2.5 py-1 rounded border border-slate-200 shrink-0">
+                            <span class="text-[10px] text-slate-500 font-semibold">Peso (w<sub>ij</sub>): <b>${laObj.peso}</b></span>
+                            <span class="text-[10px] text-slate-400">|</span>
+                            <span id="badge_estatus_${lineaKey}" class="text-[10px] font-bold ${datosLinea.cumplida ? 'text-emerald-700' : 'text-amber-700'}">
+                                ${datosLinea.cumplida ? '✔ Cumplido (C<sub>ijt</sub> = 1)' : '⏳ Sin evidencia (C<sub>ijt</sub> = 0)'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+                            <label class="block text-[11px] font-bold text-slate-700">📄 Documento PDF Oficial (Evidencia)</label>
+                            <input type="file" accept="application/pdf" onchange="window.procesarPdfLinea(event, '${lineaKey}')" class="text-[11px] text-slate-500 w-full file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[11px] file:font-bold file:bg-[#7A1C30] file:text-white hover:file:bg-[#521220] cursor-pointer">
+                            <div class="flex justify-between items-center">
+                                <span id="badge_pdf_${lineaKey}" class="text-[10px] font-bold block truncate ${datosLinea.pdf ? 'text-emerald-700' : 'text-slate-400'}">
+                                    ${datosLinea.pdf ? `✔ ${datosLinea.pdf.nombre}` : '⏳ Sin PDF adjunto'}
+                                </span>
+                                ${datosLinea.pdf ? `<button type="button" onclick="window.quitarPdfLinea('${lineaKey}')" class="text-rose-600 hover:text-rose-800 font-bold text-[10px]">Quitar PDF</button>` : ''}
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <label class="block text-[11px] font-bold text-slate-700">📷 Fotografías de Respaldo</label>
+                                <span id="contador_img_${lineaKey}" class="text-[10px] font-bold text-slate-600 bg-slate-200 px-1.5 py-0.5 rounded">${datosLinea.imagenes.length} Foto(s)</span>
+                            </div>
+                            <input type="file" accept="image/*" multiple onchange="window.procesarImagenesLinea(event, '${lineaKey}')" class="text-[11px] text-slate-500 w-full file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[11px] file:font-bold file:bg-slate-700 file:text-white hover:file:bg-slate-800 cursor-pointer">
+                            <div id="galeria_${lineaKey}" class="grid grid-cols-4 gap-1.5 pt-1">
+                                ${datosLinea.imagenes.map((img, imgIdx) => `
+                                    <div class="relative rounded border bg-white p-0.5">
+                                        <img src="${img.base64}" class="h-10 w-full object-cover rounded">
+                                        <button type="button" onclick="window.quitarImagenLinea('${lineaKey}', ${imgIdx})" class="absolute -top-1 -right-1 bg-rose-700 text-white font-bold text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center">✕</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                contenedor.appendChild(card);
+            });
+            window.evaluarYRecalcularAutomatico();
+            cargarTablaRegistros();
         };
 
-        window.descargarManualPDF = function(e) {
-            e.preventDefault();
-            const urlPdf = "../docs/Manual_PMD_2026_2029.pdf";
-            const a = document.createElement('a');
-            a.href = urlPdf;
-            a.download = "Manual_Oficial_PMD_SanAndresTuxtla.pdf";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            mostrarNotificacion("Descargando manual oficial en PDF...", "exito");
+        window.evaluarYRecalcularAutomatico = function() {
+            let total = 0;
+            Object.keys(evidenciasPorLineaMap).forEach(lineaKey => {
+                const datos = evidenciasPorLineaMap[lineaKey];
+                const tieneEvidencia = datos.pdf !== null || (datos.imagenes && datos.imagenes.length > 0);
+                if (tieneEvidencia) {
+                    datos.cumplida = true;
+                    datos.puntajePonderado = datos.peso;
+                } else {
+                    datos.cumplida = false;
+                    datos.puntajePonderado = 0;
+                }
+                total += datos.puntajePonderado;
+                const badgeEstatus = document.getElementById(`badge_estatus_${lineaKey}`);
+                if (badgeEstatus) {
+                    badgeEstatus.className = datos.cumplida ? "text-[10px] font-bold text-emerald-700" : "text-[10px] font-bold text-amber-700";
+                    badgeEstatus.innerText = datos.cumplida ? `✔ Cumplido (+${datos.peso})` : '⏳ Sin evidencia (0)';
+                }
+            });
+            const spanTotal = document.getElementById('puntajeTotalEstrategia');
+            if (spanTotal) {
+                spanTotal.innerText = total.toFixed(4);
+                spanTotal.className = total >= 0.7 ? "text-emerald-700 font-extrabold" : "text-[#7A1C30] font-extrabold";
+            }
         };
 
-        window.previewMultipleImagenesBase64 = function(event) {
-            const files = Array.from(event.target.files);
-            files.forEach(file => {
+        window.procesarPdfLinea = function(event, lineaKey) {
+            const file = event.target.files[0];
+            if (!file) return;
+            procesarArchivoEvidencia({ files: [file] }, function(base64String, fileName) {
+                evidenciasPorLineaMap[lineaKey].pdf = { base64: base64String, nombre: fileName };
+                window.evaluarYRecalcularAutomatico();
+                window.actualizarInterfacesVisualesLineas(lineaKey);
+                mostrarNotificacion(`PDF "${fileName}" adjuntado correctamente.`, "exito");
+            });
+        };
+
+        window.quitarPdfLinea = function(lineaKey) {
+            evidenciasPorLineaMap[lineaKey].pdf = null;
+            window.evaluarYRecalcularAutomatico();
+            window.actualizarInterfacesVisualesLineas(lineaKey);
+            mostrarNotificacion("PDF eliminado de la línea de acción.", "exito");
+        };
+
+        window.procesarImagenesLinea = function(event, lineaKey) {
+            Array.from(event.target.files).forEach(file => {
                 procesarArchivoEvidencia({ files: [file] }, function(base64String, fileName) {
-                    fotosEvidenciaArray.push({ base64: base64String, nombre: fileName });
-                    renderizarGaleriaPreview();
+                    evidenciasPorLineaMap[lineaKey].imagenes.push({ base64: base64String, nombre: fileName });
+                    window.evaluarYRecalcularAutomatico();
+                    window.actualizarInterfacesVisualesLineas(lineaKey);
+                    mostrarNotificacion(`Fotografía agregada a la línea.`, "exito");
                 });
             });
         };
 
-        function renderizarGaleriaPreview() {
-            const container = document.getElementById('galeriaPreviewBox');
-            const contador = document.getElementById('contadorFotos');
-            container.innerHTML = "";
-            container.classList.toggle('hidden', fotosEvidenciaArray.length === 0);
-
-            fotosEvidenciaArray.forEach((foto, index) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = "relative group rounded border bg-white p-1 shadow-sm";
-                itemDiv.innerHTML = `
-                    <img src="${foto.base64}" class="h-16 w-full object-cover rounded cursor-pointer">
-                    <button type="button" onclick="window.quitarFotoGaleria(${index})" class="absolute -top-1.5 -right-1.5 bg-rose-700 text-white font-bold text-[9px] w-4 h-4 rounded-full flex items-center justify-center">✕</button>
-                `;
-                container.appendChild(itemDiv);
-            });
-            contador.innerText = `${fotosEvidenciaArray.length} Foto(s) cargada(s)`;
-            contador.className = fotosEvidenciaArray.length >= 1 ? "text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200" : "text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200";
-        }
-
-        window.quitarFotoGaleria = (index) => { fotosEvidenciaArray.splice(index, 1); renderizarGaleriaPreview(); };
-
-        window.previewPdfBase64 = function(event) {
-            procesarArchivoEvidencia(event.target, function(base64String, fileName) {
-                pdfBase64 = base64String;
-                nombrePdf = fileName;
-                document.getElementById('previewBoxPdf').classList.remove('hidden');
-                document.getElementById('nombrePdfPreview').innerText = fileName;
-            });
+        window.quitarImagenLinea = function(lineaKey, imgIdx) {
+            evidenciasPorLineaMap[lineaKey].imagenes.splice(imgIdx, 1);
+            window.evaluarYRecalcularAutomatico();
+            window.actualizarInterfacesVisualesLineas(lineaKey);
+            mostrarNotificacion("Fotografía eliminada.", "exito");
         };
 
-        window.quitarPdfSeleccionado = () => { pdfBase64 = ""; nombrePdf = ""; document.getElementById('previewBoxPdf').classList.add('hidden'); };
-
-        window.actualizarMetaOficial = function() {
-            const select = document.getElementById('selectPrograma');
-            document.getElementById('inputIndicadorText').value = select.options[select.selectedIndex].getAttribute('data-desc');
-            window.calcularIndiceInterno();
-        };
-
-        window.calcularIndiceInterno = function() {
-            const programada = parseFloat(document.getElementById('inputMetaProgramada').value) || 0;
-            const alcanzada = parseFloat(document.getElementById('inputMetaAlcanzada').value) || 0;
-            if (programada > 0 && typeof calcularIndiceCumplimiento === 'function') {
-                const res = calcularIndiceCumplimiento(programada, alcanzada);
-                const box = document.getElementById('boxCalculoIE');
-                box.innerText = res.porcentaje + '% (' + res.nivel.toUpperCase() + ')';
-                box.className = 'text-xs font-bold p-2.5 rounded border text-center ' + res.clase;
-            } else {
-                const box = document.getElementById('boxCalculoIE');
-                box.innerText = '0.0%';
-                box.className = 'text-xs font-bold text-slate-400 bg-slate-50 p-2.5 rounded border border-slate-200 text-center';
+        window.actualizarInterfacesVisualesLineas = function(lineaKey) {
+            const datos = evidenciasPorLineaMap[lineaKey];
+            const badgePdf = document.getElementById(`badge_pdf_${lineaKey}`);
+            if (badgePdf) {
+                badgePdf.className = datos.pdf ? "text-[10px] font-bold block truncate text-emerald-700" : "text-[10px] font-bold block truncate text-slate-400";
+                badgePdf.innerText = datos.pdf ? `✔ ${datos.pdf.name || datos.pdf.nombre}` : '⏳ Sin PDF adjunto';
+            }
+            const contadorImg = document.getElementById(`contador_img_${lineaKey}`);
+            if (contadorImg) contadorImg.innerText = `${datos.imagenes.length} Foto(s)`;
+            const galeria = document.getElementById(`galeria_${lineaKey}`);
+            if (galeria) {
+                galeria.innerHTML = datos.imagenes.map((img, imgIdx) => `
+                    <div class="relative rounded border bg-white p-0.5">
+                        <img src="${img.base64}" class="h-10 w-full object-cover rounded">
+                        <button type="button" onclick="window.quitarImagenLinea('${lineaKey}', ${imgIdx})" class="absolute -top-1 -right-1 bg-rose-700 text-white font-bold text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center">✕</button>
+                    </div>
+                `).join('');
             }
         };
+
+        window.seleccionarTodosMeses = (m) => document.querySelectorAll('input[name="mesCheck"]').forEach(cb => cb.checked = m);
 
         window.guardarOActualizarRegistro = async function(e) {
             e.preventDefault();
-            if (fotosEvidenciaArray.length < 1) {
-                mostrarNotificacion("Se requiere mínimo 1 fotografía de evidencia de campo.", "error");
-                return;
-            }
-
-            // Recolectar meses seleccionados del checklist
-            const mesesSeleccionados = Array.from(document.querySelectorAll('input[name="mesCheck"]:checked'))
-                                              .map(cb => cb.value);
-
+            const mesesSeleccionados = Array.from(document.querySelectorAll('input[name="mesCheck"]:checked')).map(cb => cb.value);
             if (mesesSeleccionados.length === 0) {
-                mostrarNotificacion("Debe seleccionar al menos un mes para el corte de avance.", "error");
+                mostrarNotificacion("Debe seleccionar al menos un mes para el periodo del reporte.", "error");
                 return;
             }
 
-            let periodoTexto = mesesSeleccionados.length === 1 
-                ? mesesSeleccionados[0] 
-                : `${mesesSeleccionados[0]} a ${mesesSeleccionados[mesesSeleccionados.length - 1]}`;
+            let tieneAlMenosUno = Object.values(evidenciasPorLineaMap).some(l => l.pdf !== null || l.imagenes.length > 0);
+            if (!tieneAlMenosUno) {
+                mostrarNotificacion("Debe adjuntar al menos un documento PDF o fotografía en alguna de las líneas de acción.", "error");
+                return;
+            }
 
+            let puntajeFinalSuma = 0;
+            Object.values(evidenciasPorLineaMap).forEach(l => {
+                puntajeFinalSuma += (l.puntajePonderado || 0);
+            });
+            const porcentajeCalculadoIE = (puntajeFinalSuma * 100).toFixed(1) + "%";
+
+            const periodoTexto = mesesSeleccionados.length === 1 ? mesesSeleccionados[0] : `${mesesSeleccionados[0]} a ${mesesSeleccionados[mesesSeleccionados.length - 1]}`;
             const editId = document.getElementById('editReportId').value;
-            const select = document.getElementById('selectPrograma');
-            const metaProg = document.getElementById('inputMetaProgramada').value;
-            const metaAlcanzada = document.getElementById('inputMetaAlcanzada').value;
-            let porcentajeCalc = calcularIndiceCumplimiento ? calcularIndiceCumplimiento(metaProg, metaAlcanzada).porcentaje + "%" : "0%";
+            const claveEstr = document.getElementById('selectEstrategia').value;
+            const infoEstr = catalogoPMD_Eje2[claveEstr];
+            const anioSeleccionado = document.getElementById('selectAnioFiscal').value;
 
             const datosReporte = {
                 dependencia: "Eje 2: Desarrollo Económico que Genera",
                 eje: "Eje 2: Desarrollo Económico que Genera",
-                programa: select.options[select.selectedIndex].text,
+                estrategiaKey: claveEstr,
+                estrategia: infoEstr.nombre,
+                lineaAccion: "Indicador Yj Evaluado por Fórmula",
+                programa: infoEstr.nombre,
                 mesesArray: mesesSeleccionados,
                 periodoReporte: periodoTexto,
-                anioFiscal: document.getElementById('selectAnioFiscal').value,
-                metaProgramada: metaProg,
-                metaAlcanzada: metaAlcanzada,
-                porcentajeIE: porcentajeCalc,
-                localidad: document.getElementById('inputLocalidad').value,
+                anioFiscal: anioSeleccionado,
+                metaExigidaAnual: infoEstr.metasAnuales[anioSeleccionado],
+                porcentajeIE: porcentajeCalculadoIE,
                 descripcion: document.getElementById('inputDescripcion').value,
-                fotosEvidencia: fotosEvidenciaArray,
-                documentoPdfBase64: pdfBase64,
-                documentoPdfNombre: nombrePdf || "Documento_Oficial.pdf",
-                estatusAuditoria: "En Revisión",
-                comentariosAuditoria: editId ? "Reporte actualizado y enviado para reevaluación." : "Reporte enviado para validación institucional."
+                evidenciasPorLineaMap: evidenciasPorLineaMap,
+                estatusAuditoria: "Pendiente de Validación",
+                comentariosAuditoria: "Corte enviado por operativo, en espera de revisión de Contraloría."
             };
 
             if (editId) {
-                const resultado = await actualizarReporteBD(editId, datosReporte);
-                if (resultado && resultado.exito) {
-                    mostrarNotificacion("¡Reporte actualizado con éxito!", "exito");
-                    setTimeout(() => location.reload(), 1000);
+                const res = await actualizarReporteBD(editId, datosReporte);
+                if (res && res.exito) {
+                    mostrarNotificacion("¡Expediente actualizado correctamente!", "exito");
+                    window.cancelarEdicion();
+                    reportesLocales = await obtenerReportesBD();
+                    cargarTablaRegistros();
                 } else {
-                    mostrarNotificacion("Error al actualizar el registro.", "error");
+                    mostrarNotificacion("Error al actualizar el expediente.", "error");
                 }
             } else {
-                const resultado = await guardarReporteBD(datosReporte);
-                if (resultado && resultado.exito) {
-                    mostrarNotificacion("¡Reporte guardado con éxito en Firebase!", "exito");
-                    setTimeout(() => location.reload(), 1000);
+                const res = await guardarReporteBD(datosReporte);
+                if (res && res.exito) {
+                    mostrarNotificacion("¡Expediente enviado con éxito a Contraloría!", "exito");
+                    window.cancelarEdicion();
+                    reportesLocales = await obtenerReportesBD();
+                    cargarTablaRegistros();
                 } else {
-                    mostrarNotificacion("Error al registrar en la base de datos.", "error");
+                    mostrarNotificacion("Error al guardar el expediente.", "error");
                 }
             }
         };
@@ -623,190 +766,201 @@
             if (!item) return;
 
             document.getElementById('editReportId').value = item.id;
-            document.getElementById('inputMetaProgramada').value = item.metaProgramada;
-            document.getElementById('inputMetaAlcanzada').value = item.metaAlcanzada;
-            document.getElementById('inputLocalidad').value = item.localidad || '';
             document.getElementById('inputDescripcion').value = item.descripcion || '';
 
-            // Limpiar checklist primero
             document.querySelectorAll('input[name="mesCheck"]').forEach(cb => cb.checked = false);
-
-            // Marcar meses guardados
             if (item.mesesArray && Array.isArray(item.mesesArray)) {
                 item.mesesArray.forEach(mes => {
                     const cb = document.querySelector(`input[name="mesCheck"][value="${mes}"]`);
                     if (cb) cb.checked = true;
                 });
-            } else if (item.mesReporte) {
-                const cb = document.querySelector(`input[name="mesCheck"][value="${item.mesReporte}"]`);
-                if (cb) cb.checked = true;
             }
 
-            if (item.anioFiscal) {
-                document.getElementById('selectAnioFiscal').value = item.anioFiscal;
-            }
+            if (item.anioFiscal) document.getElementById('selectAnioFiscal').value = item.anioFiscal;
+            if (item.estrategiaKey) document.getElementById('selectEstrategia').value = item.estrategiaKey;
 
-            const select = document.getElementById('selectPrograma');
-            for (let i = 0; i < select.options.length; i++) {
-                if (select.options[i].text === item.programa) {
-                    select.selectedIndex = i;
-                    break;
+            evidenciasPorLineaMap = item.evidenciasPorLineaMap || item.evidenciasPorLinea || {};
+            const claveEstr = document.getElementById('selectEstrategia').value;
+            const info = catalogoPMD_Eje2[claveEstr];
+            const contenedor = document.getElementById('contenedorLineasAccion');
+            contenedor.innerHTML = "";
+
+            info.lineas.forEach((laObj, idx) => {
+                const lineaKey = `linea_${idx + 1}`;
+                if (!evidenciasPorLineaMap[lineaKey]) {
+                    evidenciasPorLineaMap[lineaKey] = { pdf: null, imagenes: [], peso: laObj.peso, cumplida: false, puntajePonderado: 0 };
+                } else if (!evidenciasPorLineaMap[lineaKey].imagenes && evidenciasPorLineaMap[lineaKey].fotos) {
+                    evidenciasPorLineaMap[lineaKey].imagenes = evidenciasPorLineaMap[lineaKey].fotos;
                 }
-            }
-            window.actualizarMetaOficial();
+                const datosLinea = evidenciasPorLineaMap[lineaKey];
+                datosLinea.peso = laObj.peso;
 
-            fotosEvidenciaArray = item.fotosEvidencia || [];
-            renderizarGaleriaPreview();
+                const card = document.createElement('div');
+                card.className = "p-4 bg-white rounded-xl border border-slate-200 shadow-sm space-y-3";
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                        <span class="text-xs font-bold text-slate-900">• ${laObj.texto}</span>
+                        <div class="flex items-center space-x-2 bg-slate-50 px-2.5 py-1 rounded border border-slate-200 shrink-0">
+                            <span class="text-[10px] text-slate-500 font-semibold">Peso (w<sub>ij</sub>): <b>${laObj.peso}</b></span>
+                            <span class="text-[10px] text-slate-400">|</span>
+                            <span id="badge_estatus_${lineaKey}" class="text-[10px] font-bold ${datosLinea.cumplida ? 'text-emerald-700' : 'text-amber-700'}">
+                                ${datosLinea.cumplida ? `✔ Cumplido (+${laObj.peso})` : '⏳ Sin evidencia (0)'}
+                            </span>
+                        </div>
+                    </div>
 
-            if (item.documentoPdfBase64) {
-                pdfBase64 = item.documentoPdfBase64;
-                nombrePdf = item.documentoPdfNombre || "Documento.pdf";
-                document.getElementById('previewBoxPdf').classList.remove('hidden');
-                document.getElementById('nombrePdfPreview').innerText = nombrePdf;
-            }
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+                            <label class="block text-[11px] font-bold text-slate-700">📄 Documento PDF Oficial (Evidencia)</label>
+                            <input type="file" accept="application/pdf" onchange="window.procesarPdfLinea(event, '${lineaKey}')" class="text-[11px] text-slate-500 w-full file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[11px] file:font-bold file:bg-[#7A1C30] file:text-white hover:file:bg-[#521220] cursor-pointer">
+                            <div class="flex justify-between items-center">
+                                <span id="badge_pdf_${lineaKey}" class="text-[10px] font-bold block truncate ${datosLinea.pdf ? 'text-emerald-700' : 'text-slate-400'}">
+                                    ${datosLinea.pdf ? `✔ ${datosLinea.pdf.name || datosLinea.pdf.nombre}` : '⏳ Sin PDF adjunto'}
+                                </span>
+                                ${datosLinea.pdf ? `<button type="button" onclick="window.quitarPdfLinea('${lineaKey}')" class="text-rose-600 hover:text-rose-800 font-bold text-[10px]">Quitar PDF</button>` : ''}
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <label class="block text-[11px] font-bold text-slate-700">📷 Fotografías de Respaldo</label>
+                                <span id="contador_img_${lineaKey}" class="text-[10px] font-bold text-slate-600 bg-slate-200 px-1.5 py-0.5 rounded">${datosLinea.imagenes.length} Foto(s)</span>
+                            </div>
+                            <input type="file" accept="image/*" multiple onchange="window.procesarImagenesLinea(event, '${lineaKey}')" class="text-[11px] text-slate-500 w-full file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[11px] file:font-bold file:bg-slate-700 file:text-white hover:file:bg-slate-800 cursor-pointer">
+                            <div id="galeria_${lineaKey}" class="grid grid-cols-4 gap-1.5 pt-1">
+                                ${datosLinea.imagenes.map((img, imgIdx) => `
+                                    <div class="relative rounded border bg-white p-0.5">
+                                        <img src="${img.base64}" class="h-10 w-full object-cover rounded">
+                                        <button type="button" onclick="window.quitarImagenLinea('${lineaKey}', ${imgIdx})" class="absolute -top-1 -right-1 bg-rose-700 text-white font-bold text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center">✕</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                contenedor.appendChild(card);
+            });
 
-            document.getElementById('tituloFormulario').innerText = "Editando Registro de Avance — Eje 2";
-            document.getElementById('badgeEstatusForm').innerText = "Estatus: En Edición";
-            document.getElementById('textoBotonGuardar').innerText = "Actualizar Registro en Firebase";
+            window.evaluarYRecalcularAutomatico();
+            window.actualizarMetaAnualVisual();
+            document.getElementById('tituloFormulario').innerText = "Editando Expediente — Eje 2";
+            document.getElementById('badgeEstatusForm').innerText = "Estatus: En Edición por Corrección";
+            document.getElementById('badgeEstatusForm').className = "px-3 py-1 bg-rose-50 text-rose-800 border border-rose-200 rounded text-xs font-bold";
+            document.getElementById('textoBotonGuardar').innerText = "Actualizar y Reenviar Expediente";
             document.getElementById('btnCancelarEdicion').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            mostrarNotificacion("Modo edición activado.", "exito");
+            mostrarNotificacion("Modo de edición activado.", "exito");
         };
 
-        window.cancelarEdicion = function() { location.reload(); };
+        window.eliminarRegistroBD_Local = async function(id) {
+            if (!confirm("¿Está seguro de eliminar este expediente?")) return;
+            if (typeof eliminarReporteBD === 'function') {
+                const res = await eliminarReporteBD(id);
+                if (res && res.exito) {
+                    mostrarNotificacion("Expediente eliminado correctamente.", "exito");
+                    reportesLocales = await obtenerReportesBD();
+                    cargarTablaRegistros();
+                } else {
+                    mostrarNotificacion("Error al eliminar el registro.", "error");
+                }
+            }
+        };
 
-        async function cargarTablaRegistros() {
+        window.cancelarEdicion = () => {
+            document.getElementById('formServicios').reset();
+            document.getElementById('editReportId').value = "";
+            document.getElementById('tituloFormulario').innerText = "Integración de Expediente — Eje 2: Desarrollo Económico que Genera";
+            document.getElementById('badgeEstatusForm').innerText = "Estatus: Pendiente de Envío";
+            document.getElementById('badgeEstatusForm').className = "px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded text-xs font-bold";
+            document.getElementById('textoBotonGuardar').innerText = "Enviar Expediente Mensual a Contraloría";
+            document.getElementById('btnCancelarEdicion').classList.add('hidden');
+            window.cambiarEstrategiaFormulario(true);
+        };
+
+        function cargarTablaRegistros() {
             const tbody = document.getElementById('tbodyDept');
-            const todos = await obtenerReportesBD();
-            reportesLocales = todos.filter(r => r.dependencia === "Eje 2: Desarrollo Económico que Genera" || r.eje === "Eje 2: Desarrollo Económico que Genera" || r.dependencia === "Desarrollo Económico y Turismo");
+            const claveEstrActual = document.getElementById('selectEstrategia').value;
+            const anioActualForm = document.getElementById('selectAnioFiscal').value;
+            
+            const filtrados = reportesLocales.filter(r => 
+                (r.dependencia === "Eje 2: Desarrollo Económico que Genera" || r.eje === "Eje 2: Desarrollo Económico que Genera") &&
+                r.estrategiaKey === claveEstrActual
+            );
 
-            if (reportesLocales.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 italic">No hay registros guardados.</td></tr>`;
+            const infoEstr = catalogoPMD_Eje2[claveEstrActual];
+
+            if (filtrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">No hay registros de avance capturados para esta estrategia.</td></tr>`;
+                document.getElementById('sumaAcumuladaTabla').innerText = `0.0% Anual (0.0% del Cuatrienio)`;
                 return;
             }
 
             tbody.innerHTML = "";
-            reportesLocales.forEach((item, index) => {
-                let numFotos = item.fotosEvidencia?.length || (item.evidenciaBase64 ? 1 : 0);
-                let tieneFotos = (item.fotosEvidencia && item.fotosEvidencia.length > 0) || item.evidenciaBase64;
+            let registrosPorAnio = {};
+            filtrados.forEach(item => {
+                const anio = item.anioFiscal || "2026";
+                if (!registrosPorAnio[anio]) registrosPorAnio[anio] = [];
+                registrosPorAnio[anio].push(parseFloat(item.porcentajeIE) || 0);
+            });
 
-                let evidenciasHtml = '<div class="flex items-center justify-center gap-3">';
+            let porcAniosArray = registrosPorAnio[anioActualForm] || [0];
+            let sumaAnual = porcAniosArray.reduce((a, b) => a + b, 0);
+            let promedioEfectivoAnual = porcAniosArray.length > 0 ? (sumaAnual / porcAniosArray.length) : 0;
+            let aporteAlCuatrienio = (promedioEfectivoAnual * 0.25).toFixed(1);
+
+            filtrados.forEach((item) => {
+                const mapLineas = item.evidenciasPorLineaMap || item.evidenciasPorLinea || {};
+                let resumenHtml = `<div class="flex flex-col gap-1 text-[11px]">`;
                 
-                if (tieneFotos) {
-                    evidenciasHtml += `
-                        <button type="button" onclick="window.abrirCarruselReporte(${index})" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-[#7A1C30] border border-slate-300 rounded-lg text-[10px] font-bold inline-flex flex-col items-center gap-0.5 transition shadow-sm" title="Ver carrusel de ${numFotos} fotos">
-                            <i class="bi bi-images text-base"></i>
-                            <span>Ver ${numFotos} fotos</span>
-                        </button>
-                    `;
-                } else {
-                    evidenciasHtml += `<span class="text-slate-400 italic text-[11px]">Sin fotos</span>`;
-                }
+                Object.keys(mapLineas).forEach((k) => {
+                    const lData = mapLineas[k];
+                    const imgs = lData.imagenes || lData.fotos || [];
+                    if (lData.pdf || imgs.length > 0) {
+                        const idxNum = parseInt(k.replace('linea_', '')) - 1;
+                        const textoLineaOficial = infoEstr.lineas[idxNum] ? infoEstr.lineas[idxNum].texto : `Línea ${idxNum + 1}`;
+                        resumenHtml += `<div class="border-b border-slate-100 pb-1 mb-1"><b>${textoLineaOficial}</b><br>`;
+                        if (lData.pdf) resumenHtml += `<a href="${lData.pdf.base64}" download="${lData.pdf.nombre || lData.pdf.name}" class="text-red-700 underline font-bold">📄 ${lData.pdf.nombre || lData.pdf.name}</a> `;
+                        if (imgs.length > 0) resumenHtml += `<span class="text-slate-600">📷 ${imgs.length} foto(s)</span>`;
+                        resumenHtml += `</div>`;
+                    }
+                });
+                resumenHtml += `</div>`;
 
-                if (item.documentoPdfBase64) {
-                    evidenciasHtml += `
-                        <a href="${item.documentoPdfBase64}" download="${item.documentoPdfNombre || 'Documento.pdf'}" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-[10px] font-bold inline-flex flex-col items-center gap-0.5 transition shadow-sm" title="Descargar documento PDF oficial">
-                            <i class="bi bi-file-earmark-pdf text-base"></i>
-                            <span>Descargar</span>
-                        </a>
-                    `;
-                }
-                evidenciasHtml += '</div>';
+                let estatusClass = "bg-amber-50 text-amber-800 border-amber-200";
+                if (item.estatusAuditoria?.includes("Aprobado") || item.estatusAuditoria?.includes("Liberado")) estatusClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                if (item.estatusAuditoria?.includes("Corrección")) estatusClass = "bg-rose-50 text-rose-700 border-rose-200";
 
-                let estatusColor = "bg-amber-50 text-amber-700 border-amber-200";
-                let estatusText = item.estatusAuditoria || "En Revisión";
-                if (estatusText === "Aprobado") estatusColor = "bg-emerald-50 text-emerald-700 border-emerald-200";
-                if (estatusText === "Corrección") estatusColor = "bg-rose-50 text-rose-700 border-rose-200";
-
-                let periodoVisual = item.periodoReporte || (Array.isArray(item.mesesArray) ? item.mesesArray.join(', ') : item.mesReporte) || 'Periodo N/A';
+                const descripcionHtml = item.descripcion && item.descripcion.trim() !== ""
+                    ? `<p class="text-[10px] text-slate-500 italic mt-0.5">"${item.descripcion}"</p>`
+                    : "";
 
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 border-b align-top";
                 tr.innerHTML = `
-                    <td class="p-3 font-medium">
-                        ${item.programa}
-                        <div class="mt-1">
-                            <span class="inline-block bg-amber-100 text-amber-900 px-2 py-0.5 rounded text-[10px] font-bold">📅 ${periodoVisual} (${item.anioFiscal || '2026'})</span>
-                        </div>
+                    <td class="p-3"><p class="font-bold text-slate-900">${item.estrategia}</p></td>
+                    <td class="p-3">
+                        <span class="inline-block bg-amber-100 text-amber-900 px-2 py-0.5 rounded text-[10px] font-bold">📅 ${item.periodoReporte} (Año: ${item.anioFiscal || '2026'})</span>
+                        <p class="text-[10px] text-slate-500 italic mt-1">Meta Anual Exigida (Manual): ${item.metaExigidaAnual || 'N/A'}</p>
+                        ${descripcionHtml}
                     </td>
-                    <td class="p-3 space-y-0.5">
-                        <p class="font-bold text-slate-900">${item.localidad || 'N/A'}</p>
-                        <p class="text-[11px] text-slate-500 italic">"${item.descripcion || 'Sin descripción'}"</p>
+                    <td class="p-3 text-center">${resumenHtml}</td>
+                    <td class="p-3 text-center font-extrabold text-[#7A1C30] text-sm">${item.porcentajeIE || '0.0%'}</td>
+                    <td class="p-3">
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${estatusClass}">${item.estatusAuditoria || 'Pendiente'}</span>
+                        <p class="text-[10px] text-slate-500 italic mt-1">${item.comentariosAuditoria || ''}</p>
                     </td>
-                    <td class="p-3 text-center font-semibold">${item.metaProgramada} / ${item.metaAlcanzada}</td>
-                    <td class="p-3 text-center font-bold text-[#7A1C30]">${item.porcentajeIE}</td>
-                    <td class="p-3 text-center">${evidenciasHtml}</td>
-                    <td class="p-3 space-y-1">
-                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border ${estatusColor}">${estatusText}</span>
-                        <p class="text-[11px] text-slate-700 font-medium bg-amber-50/50 p-1.5 rounded border border-amber-100">💬 "${item.comentariosAuditoria || 'Sin observaciones del dashboard.'}"</p>
-                    </td>
-                    <td class="p-3 text-right space-y-1">
-                        <button type="button" onclick="window.cargarDatosEdicion('${item.id}')" class="block w-full px-2 py-1 bg-amber-50 text-amber-800 rounded text-[11px] font-semibold hover:bg-amber-100 text-center">Editar</button>
-                        <button type="button" onclick="confirmarEliminar('${item.id}')" class="block w-full px-2 py-1 bg-rose-50 text-rose-700 rounded text-[11px] font-semibold hover:bg-rose-100 text-center">Eliminar</button>
+                    <td class="p-3 text-right space-x-1">
+                        <button type="button" onclick="window.cargarDatosEdicion('${item.id}')" class="px-2 py-1 bg-amber-50 text-amber-800 border rounded text-[11px] font-semibold hover:bg-amber-100">Editar</button>
+                        <button type="button" onclick="window.eliminarRegistroBD_Local('${item.id}')" class="px-2 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded text-[11px] font-semibold hover:bg-rose-100">Eliminar</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+
+            document.getElementById('sumaAcumuladaTabla').innerHTML = `
+                <span class="block">${promedioEfectivoAnual.toFixed(1)}% (Desempeño Año ${anioActualForm})</span>
+                <span class="text-[10px] text-slate-500 font-normal">Aporte al Cuatrienio (25% máx): <b>${aporteAlCuatrienio}%</b></span>
+            `;
         }
-
-        window.abrirCarruselReporte = function(index) {
-            const item = reportesLocales[index];
-            carruselFotosActuales = [];
-
-            if (item.fotosEvidencia && item.fotosEvidencia.length > 0) {
-                carruselFotosActuales = item.fotosEvidencia.map(f => f.base64);
-            } else if (item.evidenciaBase64) {
-                carruselFotosActuales = [item.evidenciaBase64];
-            }
-
-            if (carruselFotosActuales.length === 0) {
-                mostrarNotificacion("Este reporte no contiene fotografías.", "error");
-                return;
-            }
-
-            carruselIndiceActual = 0;
-            document.getElementById('carruselTitulo').innerText = `Reporte: ${item.programa}`;
-            document.getElementById('carruselSubtitulo').innerText = `Localidad: ${item.localidad || 'N/A'}`;
-            
-            actualizarImagenCarrusel();
-            document.getElementById('modalCarrusel').classList.remove('hidden');
-        };
-
-        window.cambiarFotoCarrusel = function(dir) {
-            carruselIndiceActual += dir;
-            if (carruselIndiceActual < 0) carruselIndiceActual = carruselFotosActuales.length - 1;
-            if (carruselIndiceActual >= carruselFotosActuales.length) carruselIndiceActual = 0;
-            actualizarImagenCarrusel();
-        };
-
-        function actualizarImagenCarrusel() {
-            document.getElementById('carruselImagenActiva').src = carruselFotosActuales[carruselIndiceActual];
-            document.getElementById('carruselContador').innerText = `Foto ${carruselIndiceActual + 1} de ${carruselFotosActuales.length}`;
-        }
-
-        window.cerrarCarrusel = () => document.getElementById('modalCarrusel').classList.add('hidden');
-        window.verImagenCompleta = (src, titulo) => {
-            document.getElementById('imgCompleta').src = src;
-            document.getElementById('imgPieTitulo').innerText = titulo;
-            document.getElementById('modalImagen').classList.remove('hidden');
-        };
-        window.cerrarImagenCompleta = () => document.getElementById('modalImagen').classList.add('hidden');
-
-        window.confirmarEliminar = (id) => { document.getElementById('deleteDocId').value = id; document.getElementById('modalEliminar').classList.remove('hidden'); };
-        window.cerrarModalEliminar = () => document.getElementById('modalEliminar').classList.add('hidden');
-        window.ejecutarEliminacionBD = async function() {
-            const id = document.getElementById('deleteDocId').value;
-            window.cerrarModalEliminar();
-            const res = await eliminarReporteBD(id);
-            if (res && res.exito) { mostrarNotificacion("Registro eliminado.", "exito"); setTimeout(() => location.reload(), 800); }
-        };
-
-        window.filtrarTablaDept = function() {
-            const q = document.getElementById('inputBuscarDept').value.toUpperCase();
-            document.querySelectorAll('#tbodyDept tr').forEach(row => {
-                row.style.display = row.innerText.toUpperCase().includes(q) ? '' : 'none';
-            });
-        };
     </script>
 </body>
 </html>

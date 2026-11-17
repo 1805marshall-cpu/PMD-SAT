@@ -20,6 +20,40 @@ if (typeof firebase !== 'undefined') {
 }
 
 // ==========================================
+// SISTEMA DE NOTIFICACIONES TOAST ESTILIZADAS
+// ==========================================
+window.mostrarNotificacionGlobal = function(mensaje, tipo = 'exito') {
+    let container = document.getElementById('toastContainer');
+    
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'fixed top-5 right-5 z-50 space-y-3 pointer-events-none';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    const isExito = tipo === 'exito';
+    const bgColor = isExito 
+        ? 'bg-slate-900 text-white border-l-4 border-emerald-500' 
+        : 'bg-slate-900 text-white border-l-4 border-amber-500';
+    const icon = isExito 
+        ? '<i class="bi bi-check-circle-fill text-emerald-400 text-base"></i>' 
+        : '<i class="bi bi-exclamation-triangle-fill text-amber-400 text-base"></i>';
+
+    toast.className = `pointer-events-auto flex items-center space-x-3 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold transition-all transform translate-y-2 opacity-0 duration-300 ${bgColor}`;
+    toast.innerHTML = `${icon}<span>${mensaje}</span>`;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+    setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+    }, 3200);
+};
+
+// ==========================================
 // DICCIONARIO DE CREDENCIALES Y RUTAS LOCALES
 // ==========================================
 const USUARIOS_SISTEMA = {
@@ -39,7 +73,6 @@ window.iniciarSesionUsuario = function(usuario, password) {
     const datosUser = USUARIOS_SISTEMA[userKey];
 
     if (datosUser && datosUser.pass === password) {
-        // Guardar sesión y nombre de usuario en localStorage
         const sesionData = {
             usuario: userKey,
             nombreDep: datosUser.dep,
@@ -84,10 +117,9 @@ window.procesarArchivoEvidencia = function(inputElement, callback) {
 
     const lector = new FileReader();
 
-    // Si el usuario subió un documento PDF
     if (archivo.type === 'application/pdf') {
         if (archivo.size > 900 * 1024) {
-            alert("⚠️ Aviso: El archivo PDF seleccionado pesa más de 900 KB. Se recomienda adjuntar un PDF optimizado.");
+            window.mostrarNotificacionGlobal("⚠️ Aviso: El PDF supera los 900 KB. Se recomienda un archivo optimizado.", "aviso");
         }
 
         lector.onload = function(e) {
@@ -100,7 +132,6 @@ window.procesarArchivoEvidencia = function(inputElement, callback) {
         return;
     }
 
-    // Si el usuario subió una imagen (JPG, PNG) -> Alta calidad (1000px, Calidad 0.82)
     lector.onload = function(e) {
         const img = new Image();
         img.src = e.target.result;
@@ -136,6 +167,61 @@ window.procesarArchivoEvidencia = function(inputElement, callback) {
         };
     };
     lector.readAsDataURL(archivo);
+};
+
+// ==========================================
+// NORMAS Y CÁLCULOS CUATRIENALES (2026 - 2029)
+// Cada año representa el 25% del total de la administración
+// ==========================================
+window.calcularAporteCuatrienal = function(porcentajeEstrategia, anioFiscal) {
+    // Cada año equivale al 25% del PMD global (2026 = 25%, 2027 = 50% acumulado, etc.)
+    const valorAnualMaximo = 25.0; 
+    const porcentajeNum = parseFloat(String(porcentajeEstrategia).replace('%','')) || 0;
+    
+    // Aporte real de este registro al cuatrienio completo (0% a 25% por año)
+    const aporteGlobal = (porcentajeNum / 100) * valorAnualMaximo;
+    
+    return {
+        porcentajeAnual: porcentajeNum.toFixed(1) + "%",
+        aporteCuatrienal: aporteGlobal.toFixed(2) + "%",
+        anio: anioFiscal || "2026"
+    };
+};
+
+// Función para consolidar los avances globales separados por año de administración (2026-2029)
+window.calcularResumenCuatrienalGlobal = function(reportes) {
+    let acumuladoAnios = {
+        "2026": { total: 0, cuenta: 0 },
+        "2027": { total: 0, cuenta: 0 },
+        "2028": { total: 0, cuenta: 0 },
+        "2029": { total: 0, cuenta: 0 }
+    };
+
+    reportes.forEach(r => {
+        const anio = r.anioFiscal || "2026";
+        const porc = parseFloat(String(r.porcentajeIE || "0").replace('%','')) || 0;
+        
+        if (acumuladoAnios[anio]) {
+            acumuladoAnios[anio].total += porc;
+            acumuladoAnios[anio].cuenta += 1;
+        }
+    });
+
+    let resultadoPorAnio = {};
+    Object.keys(acumuladoAnios).forEach(anio => {
+        const datos = acumuladoAnios[anio];
+        const promedioAnual = datos.cuenta > 0 ? (datos.total / datos.cuenta) : 0;
+        // Cada año representa un cuarto (25%) de la meta cuatrienal
+        const avanceCuatrienalAnual = (promedioAnual * 0.25).toFixed(1);
+        
+        resultadoPorAnio[anio] = {
+            promedioCumplimientoAnual: promedioAnual.toFixed(1) + "%",
+            aporteAlCuatrienio: avanceCuatrienalAnual + "% (Meta: 25%)",
+            registros: datos.cuenta
+        };
+    });
+
+    return resultadoPorAnio;
 };
 
 // ==========================================
@@ -213,7 +299,6 @@ window.eliminarReporteBD = async function(id) {
         }
 
         await db.collection(COLECCION_FIRESTORE).doc(id).delete();
-        console.log("Documento eliminado correctamente de Firestore:", id);
         return { exito: true };
     } catch (error) {
         console.error("Error al eliminar el documento en Firebase:", error);
